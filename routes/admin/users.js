@@ -97,6 +97,53 @@ router.delete(
   userController.delete
 );
 
+// Additional simplified routes from commit d72cad37
+router.get(
+    "/admin/users-basic",
+    passport.authenticate("jwt", { session: false }),
+    //userPolicy.isAllowed,
+    userController.indexBasic
+);
+
+router.delete(
+    "/admin/users-basic/:id",
+    passport.authenticate("jwt", { session: false }),
+   // languagePolicy.isAllowed,
+    userController.deleteBasic
+);
+
+router.post(
+    "/admin/users-basic/:id",
+    passport.authenticate("jwt", { session: false }),
+   // languagePolicy.isAllowed,
+    [
+        check("firstName")
+            .not()
+            .isEmpty()
+            .escape(),
+        check("lastName")
+            .not()
+            .isEmpty()
+            .escape(),
+        check("email")
+            .not()
+            .isEmpty()
+            .escape(),
+        check("password")
+            .not()
+            .isEmpty()
+            .escape(),
+    ],
+    userController.upsert
+);
+
+router.get(
+    "/admin/users-basic/:id",
+    passport.authenticate("jwt", { session: false }),
+   // languagePolicy.isAllowed,
+    userController.showBasic
+);
+
 router.get(
   "/admin/validate-token",
   passport.authenticate("jwt", { session: false }),
