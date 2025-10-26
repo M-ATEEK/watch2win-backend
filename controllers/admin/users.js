@@ -9,8 +9,85 @@ const userPermissionHierarchyIndex = require("../../helpers/userPermissionsHiera
 const _ = require("lodash");
 
 const { validationResult } = require("express-validator");
+var ObjectId = require("mongodb").ObjectID;
+const userModel = require("../../models/users-model");
 
 module.exports = {
+    // New CRUD functions from commit d72cad37
+    indexBasic: function(req, res, next) {
+        userModel.find({}, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send({
+                    message: "users fetched successfully",
+                    data: {
+                        user: data
+                    }
+                });
+            }
+        });
+    },
+    deleteBasic: function (req, res, next) {
+        let id = req.params.id;
+        let params = req.body;
+
+        userModel.findOne({_id: ObjectId(id)}, {}, (err, user) => {
+            if (err) {
+                res.sendStatus(500);
+            }
+            else if(user) {
+                user.remove();
+                res.send({
+                    message: "success.",
+                    data: {
+                        user: user
+                    }
+                });
+            } else {
+                res.sendStatus(500);
+            }
+        });
+    },
+    upsert: function (req, res, next) {
+        let id = req.params.id;
+        let params = req.body;
+      if(id == 'new') {
+        id = new ObjectId();
+      } else {
+        id = ObjectId(id);
+      }
+        userModel.updateOne({_id: id}, params, {upsert: true}, (err, user) => {
+            if (err) {
+             res.sendStatus(500);
+           } else {
+                res.send({
+                    message: "success.",
+                    data: {
+                        user: user
+                    }
+                });
+           }
+        });
+    },
+    showBasic: function (req, res, next) {
+        let id = req.params.id;
+        userModel.findOne({_id: ObjectId(id)}, {}, (err, user) => {
+            if (err) {
+                res.sendStatus(500);
+            }
+            else if(user) {
+                res.send({
+                    message: "success.",
+                    data: {
+                        user: user
+                    }
+                });
+            } else {
+                res.sendStatus(500);
+            }
+        });
+    },
   searchAdminUsers: function(req, res, next) {
     var _page = parseInt(req.query.page) || 1;
     var _limit = parseInt(req.query.limit) || 1000;

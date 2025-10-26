@@ -21,9 +21,6 @@ const UsersSchema = new Schema({
   lastName: {
     type: String
   },
-  companyName: {
-    type: String
-  },
   email: {
     type: String,
     trim: true,
@@ -36,37 +33,19 @@ const UsersSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
-  mobileNumber: {
-    type: String
-  },
   password: { type: String, required: true },
   active: { type: Boolean, default: true, required: true },
   roles: {
     type: [
       {
         type: String,
-        enum: ["client", "contact"]
+        enum: ["admin"]
       }
     ],
-    default: ["contact"]
-  },
-  userType: {
-    type: String
-  },
-  position: {
-    type: String,
-    enum: ["business", "landlord", "tenant"],
-    required: true
+    default: ["admin"]
   },
   code: {
     type: String
-  },
-  city: {
-    type: String
-  },
-  fields: {
-    type: [],
-    default: []
   },
   createdAt: {
     type: Date,
