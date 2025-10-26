@@ -34,30 +34,30 @@ router.get(
       }
     })
 );
-router.put(
-  "/user",
-  passport.authenticate("jwt", { session: false }),
-  userPolicy.isAllowed,
-  [
-    check("firstName")
-      .not()
-      .isEmpty(),
-    check("lastName")
-      .not()
-      .isEmpty(),
-    check("mobileNumber")
-      .not()
-      .isEmpty(),
-    check("companyName")
-      .not()
-      .isEmpty(),
-    check("position")
-      .not()
-      .isEmpty()
-  ],
-  validate,
-  userController.update
-);
+// router.put(
+//   "/user",
+//   passport.authenticate("jwt", { session: false }),
+//   userPolicy.isAllowed,
+//   [
+//     check("firstName")
+//       .not()
+//       .isEmpty(),
+//     check("lastName")
+//       .not()
+//       .isEmpty(),
+//     check("mobileNumber")
+//       .not()
+//       .isEmpty(),
+//     check("companyName")
+//       .not()
+//       .isEmpty(),
+//     check("position")
+//       .not()
+//       .isEmpty()
+//   ],
+//   validate,
+//   userController.updateCurrent
+// );
 router.post("/authenticate", userController.authenticate);
 router.post("/signup", userController.signup);
 router.post("/forgetpassword", userController.forgetpassword);
