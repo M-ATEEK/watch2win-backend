@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 var bcrypt = require("bcryptjs");
 var emails = require("../services/email");
 var ObjectId = require("mongodb").ObjectID;
-const Activity = require("../models/activities-model");
+// const Activity = require("../models/activities-model"); // Removed in cleanup
 var passport = require("passport");
 
 var validateEmail = function(email) {

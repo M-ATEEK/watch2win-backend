@@ -1,15 +1,16 @@
 var User = require("../models/users-model.js");
-var Admin = require("../models/admin-model.js");
+// var Admin = require("../models/admin-model.js"); // Removed in cleanup
 const bcrypt = require("bcryptjs");
 var jwt = require("jwt-simple");
 var emails = require("../services/email");
 
 nodeMailer = require("nodemailer");
-const SubScriber = require("../models/subscriber-model");
+// const SubScriber = require("../models/subscriber-model"); // Removed in cleanup
 const config = require("../config");
 var async = require("async");
 const shortid = require("shortid");
-const uniqueString = require("unique-string");
+// const uniqueString = require("unique-string"); // ES module issue, replaced with crypto
+const crypto = require("crypto");
 var fs = require("fs");
 var mv = require("mv");
 var emails = require("../services/email");
@@ -178,18 +179,18 @@ module.exports = {
           });
         }
 
-        emails.sendEmail(
-          '"InvenTally" <' + config.mailCredentials.auth.user + ">",
-          "" + req.body.email,
-          "Your customer profile has been created successfully",
-          "signup-email",
-          {
-            user: newUser,
-            link: `${config.appURL}`,
-            name: `${newUser.firstName} ${newUser.lastName}`,
-            email: newUser.email
-          }
-        );
+        // emails.sendEmail(
+        //   '"InvenTally" <' + config.mailCredentials.auth.user + ">",
+        //   "" + req.body.email,
+        //   "Your customer profile has been created successfully",
+        //   "signup-email",
+        //   {
+        //     user: newUser,
+        //     link: `${config.appURL}`,
+        //     name: `${newUser.firstName} ${newUser.lastName}`,
+        //     email: newUser.email
+        //   }
+        // );
         var token = jwt.encode(newUser, config.secret);
         res.json({
           success: true,
@@ -333,66 +334,7 @@ module.exports = {
   me: function(req, res, next) {
     res.json({ success: true, data: { user: req.user } });
   },
-  subscribe: async function(req, res, next) {
-    let transporter = nodeMailer.createTransport(config.mailCredentials);
-    let mailOptions = {
-      from: '"' + req.body.email + '" <xx@gmail.com>',
-      to: "sales@inventally.com",
-      subject: "InvenTally",
-      text: "user has subscribed",
-      html: "<ul>" + "<li>email: " + req.body.email + "</li>" + "</ul>"
-    };
-
-    // Destructure
-    const { email } = req.body;
-
-    try {
-      // Reject if the subscribing email already exists
-      const subExists = await SubScriber.findOne({ email });
-
-      if (!subExists) {
-        let subscriber = new SubScriber({
-          email
-        });
-
-        subscriber.save((err, data) => {
-          transporter.sendMail(mailOptions, (error, info) => {
-            if (err) {
-              console.log(error);
-              res.sendStatus(500);
-            } else {
-              res.send({
-                message: "Subscribed!"
-              });
-            }
-          });
-        });
-      } else {
-        res.status(400).send({
-          message: "You have already subscribed"
-        });
-      }
-    } catch (err) {
-      res.status(500).send({
-        message: "Unknwon DB Error"
-      });
-    }
-  },
-  async updateCurrent(req, res, next) {
-    try {
-      const saved = await User.updateOne(
-        { _id: req.user._id },
-        { ...req.body }
-      );
-      res.send({
-        message: "User updated"
-      });
-    } catch (err) {
-      res.status(400).send({
-        message: err.errors
-      });
-    }
-  },
+  
   update: function(req, res, next) {
     let userObject = req.body.user;
     let files = req.files;
@@ -423,7 +365,7 @@ module.exports = {
               indexTypeImage,
               imageName.length
             );
-            let imageNewName = uniqueString() + imageExtension;
+            let imageNewName = crypto.randomBytes(16).toString('hex') + imageExtension;
             let imageSavePath = imageNewName;
             let tempPath = file.tempFilePath;
             let targetPath = "../backend/public/img/users/" + imageSavePath;
