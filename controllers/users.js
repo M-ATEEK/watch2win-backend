@@ -152,15 +152,9 @@ module.exports = {
       var newUser = new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        companyName: req.body.companyName,
         email: req.body.email,
-        mobileNumber: req.body.mobileNumber,
         password: req.body.password,
-        roles: [req.body.role],
-        userType: req.body.userType,
-        position: req.body.position,
-        city: req.body.city,
-        fields: []
+        roles: [req.body.role]
       });
       newUser.save(function(err) {
         if (err) {
@@ -230,7 +224,8 @@ module.exports = {
             if (err) {
               res.send({
                 data: { user: data },
-                success: false
+                success: false,
+                err
               });
             } else {
               res.send({
@@ -264,7 +259,8 @@ module.exports = {
             if (err) {
               res.send({
                 data: { user: data },
-                success: false
+                success: false,
+                err
               });
             } else {
               res.send({
