@@ -95,7 +95,6 @@ function onListening() {
 /**
  * mongodb connection
  */
-mongoose.set("useCreateIndex", true);
 mongoose.connect(config.mongooseUriString, {
   useNewUrlParser: true
 });

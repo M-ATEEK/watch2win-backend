@@ -56,7 +56,7 @@ router.put(
       .isEmpty()
   ],
   validate,
-  userController.updateCurrent
+  userController.update
 );
 router.post("/authenticate", userController.authenticate);
 router.post("/signup", userController.signup);
@@ -68,7 +68,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   userController.me
 );
-router.post("/subscribe", userController.subscribe);
+// router.post("/subscribe", userController.subscribe); // Function removed in cleanup
 router.put(
   "/users/:id",
   fileUpload({
