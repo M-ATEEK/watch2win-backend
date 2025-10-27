@@ -4,6 +4,9 @@ var sentenceRouter = require("./routes/admin/sentence");
 var usersRouter=require("./routes/admin/users");
 var categoriesRouter=require("./routes/admin/categories");
 var athleteRouter=require("./routes/admin/athlete");
+var difficultyRouter=require("./routes/admin/difficulty");
+var speedRouter=require("./routes/admin/speed");
+var subscriptionRouter=require("./routes/admin/subscription");
 
 module.exports = function(app) {
   app.use('/api/v1', [
@@ -12,6 +15,9 @@ module.exports = function(app) {
     sentenceRouter,
     usersRouter,
     categoriesRouter,
-    athleteRouter
+    athleteRouter,
+    difficultyRouter,
+    speedRouter,
+    subscriptionRouter
   ]);
 };
