@@ -98,6 +98,7 @@ module.exports = {
                 success: false,
                 errors: { password: { message: "Password confirmation failed" } }
             });
+            return;
         }
         let id = req.params.id;
         if (req.file) {
