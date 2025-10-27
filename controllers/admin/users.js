@@ -15,21 +15,31 @@ const fs = require('fs')
 
 module.exports = {
     // New CRUD functions from commit d72cad37
-    indexBasic: function (req, res, next) {
+    indexBasic: async function (req, res, next) {
+        var _page = parseInt(req.query.page) || 1;
+        var _limit = parseInt(req.query.limit) || 10;
+        var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
+        const docCount = await userModel.countDocuments({})
+
         if (searchField === undefined) {
-            userModel.find({}, (err, data) => {
-                if (err) {
+            userModel.find({}
+            ).skip(skip)
+            .limit(_limit)
+            .sort({created_at:- searched})
+            .exec(function(err, data) {
+                if(err){
                     res.send(err);
-                } else {
+                }
+                else{
                     res.send({
+                        count:docCount,
                         message: "users fetched successfully",
                         data: {
                             user: data
-                        }
-                    });
+                        }})
                 }
-            });
+            })
         }
         else {
             userModel.find({ firstName: { $regex: searchField, $options: '$i' } }, (err, data) => {
