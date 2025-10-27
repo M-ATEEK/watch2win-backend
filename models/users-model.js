@@ -48,6 +48,9 @@ const UsersSchema = new Schema({
     ],
     default: ["admin"]
   },
+  image: {
+    type: String
+  },
   code: {
     type: String
   },

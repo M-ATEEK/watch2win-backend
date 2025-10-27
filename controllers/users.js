@@ -136,6 +136,7 @@ module.exports = {
     );
   },
   signup: function(req, res, next) {
+    console.log(req.file)
     if (!req.body.email || !req.body.password) {
       res.status(200);
       res.json({
@@ -155,7 +156,8 @@ module.exports = {
         userName: req.body.userName,
         email: req.body.email,
         password: req.body.password,
-        roles: [req.body.role]
+        roles: [req.body.role],
+        image: req.file ? req.file.filename : undefined
       });
       newUser.save(function(err) {
         if (err) {

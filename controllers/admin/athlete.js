@@ -15,6 +15,7 @@ module.exports = {
         else {
             var newAthlete = new athleteModel({
                 name: req.body.name,
+                image: req.file ? req.file.filename : undefined
             });
             newAthlete.save(function (err) {
                 if (err) {

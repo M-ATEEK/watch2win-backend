@@ -11,6 +11,7 @@ const _ = require("lodash");
 const { validationResult } = require("express-validator");
 var ObjectId = require("mongodb").ObjectID;
 const userModel = require("../../models/users-model");
+const fs = require('fs')
 
 module.exports = {
     // New CRUD functions from commit d72cad37
@@ -67,15 +68,41 @@ module.exports = {
             }
         });
     },
-    upsert: function (req, res, next) {
+    upsert: async function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
+        
+        if(req.file){
+            await userModel.findOne({_id: id}, {},
+                (err, user) => {
+                    if(user && user.image !== undefined){
+                        fs.unlink(`./public/img/${user.image}`, (err) => {
+                            if(err){
+                                console.log(err)
+                            } else {
+                                console.log('file deleted')
+                            }
+                        })
+                    }
+                    console.log(user)
+                }
+            )
+      
+            params = {
+                ...req.body,
+                image: req.file.filename
+            }
+        } else if(req.file === undefined){
+            params = req.body
+        }
+        
         if (id == 'new') {
             id = new ObjectId();
         } else {
             id = ObjectId(id);
         }
-        userModel.updateOne({ _id: id }, params, { upsert: true }, (err, user) => {
+    
+        userModel.findOneAndUpdate({ _id: id }, params, { new: true }, (err, user) => {
             if (err) {
                 res.sendStatus(500);
             } else {
