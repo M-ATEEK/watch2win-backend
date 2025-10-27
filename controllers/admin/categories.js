@@ -14,10 +14,19 @@ module.exports = {
             });
         }
         else {
-            var newCategory = new categoriesModel({
-                name: req.body.name,
-                image: req.file.filename
-            });
+            if (req.file) {
+                var newCategory = new categoriesModel({
+                    name: req.body.name,
+                    image: req.file.filename
+                });
+            }
+            else {
+                var newCategory = new categoriesModel({
+                    name: req.body.name,
+
+                });
+            }
+
             newCategory.save(function (err) {
                 if (err) {
                     console.log("Error in saving new category", err);
@@ -38,30 +47,30 @@ module.exports = {
             });
         }
     },
-    index:async function (req, res, next) {
+    index: async function (req, res, next) {
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            const docCount=await categoriesModel.countDocuments({})
+            const docCount = await categoriesModel.countDocuments({})
             categoriesModel.find({})
-            .skip(skip)
-            .limit(_limit)
-            .sort({created_at:-1})
-            .exec(function(err, category) {
-                if (err) {
-                    res.send(err);
-                } else {
-                    res.send({
-                        count:docCount,
-                        message: "categories fetched successfully",
-                        data: {
-                            category: category
-                        }
-                    });
-                }
-            })
+                .skip(skip)
+                .limit(_limit)
+                .sort({ created_at: -1 })
+                .exec(function (err, category) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.send({
+                            count: docCount,
+                            message: "categories fetched successfully",
+                            data: {
+                                category: category
+                            }
+                        });
+                    }
+                })
         }
         else {
             categoriesModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -79,9 +88,24 @@ module.exports = {
             })
         }
     },
-    delete: function (req, res, next) {
+    delete: async function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
+        await categoriesModel.findOne({ _id: id }, {},
+            (err, category) => {
+                if (category.image !== undefined) {
+                    fs.unlink(`./public/img/${category.image}`, (err) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                        else {
+                            console.log('file dlete')
+                        }
+                    })
+                }
+                console.log(category)
+            }
+        )
 
         categoriesModel.findOne({ _id: ObjectId(id) }, {}, (err, category) => {
             if (err) {
@@ -102,34 +126,35 @@ module.exports = {
     },
     upsert: async function (req, res, next) {
         let id = req.params.id;
-       // let params = req.body;
-       if(req.file){
-        await categoriesModel.findOne({_id:id},{},
-            (err,category)=>{
-                if(category.image!==undefined){
-                    fs.unlink(`./public/img/${category.image}`,(err)=>{
-                        if(err){
-                            console.log(err)
-                        }
-                        else{
-                            console.log('file dlete')
-                        }
-                    })
+        // let params = req.body;
+        if (req.file) {
+            await categoriesModel.findOne({ _id: id }, {},
+                (err, category) => {
+                    if (category.image !== undefined) {
+                        fs.unlink(`./public/img/${category.image}`, (err) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                            else {
+                                console.log('file dlete')
+                            }
+                        })
+                    }
+
+                    console.log(category)
+
                 }
-              
-              console.log(category)
-                
-            }
             )
-  
-        var params={
-            ...req.body,
-            image:req.file.filename}
-        
+
+            var params = {
+                ...req.body,
+                image: req.file.filename
+            }
+
         }
-    else if(req.file===undefined){
-        var params=req.body
-    }
+        else if (req.file === undefined) {
+            var params = req.body
+        }
         if (id == 'new') {
             id = new ObjectId();
         } else {
