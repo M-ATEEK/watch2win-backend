@@ -14,29 +14,47 @@ const userModel = require("../../models/users-model");
 
 module.exports = {
     // New CRUD functions from commit d72cad37
-    indexBasic: function(req, res, next) {
-        userModel.find({}, (err, data) => {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send({
-                    message: "users fetched successfully",
-                    data: {
-                        user: data
-                    }
-                });
-            }
-        });
+    indexBasic: function (req, res, next) {
+        let searchField = req.query.search;
+        if (searchField === undefined) {
+            userModel.find({}, (err, data) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.send({
+                        message: "users fetched successfully",
+                        data: {
+                            user: data
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            userModel.find({ firstName: { $regex: searchField, $options: '$i' } }, (err, data) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.send({
+                        message: "users searched successfully",
+                        data: {
+                            user: data
+                        }
+                    });
+                }
+
+            })
+        }
     },
     deleteBasic: function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
 
-        userModel.findOne({_id: ObjectId(id)}, {}, (err, user) => {
+        userModel.findOne({ _id: ObjectId(id) }, {}, (err, user) => {
             if (err) {
                 res.sendStatus(500);
             }
-            else if(user) {
+            else if (user) {
                 user.remove();
                 res.send({
                     message: "success.",
@@ -52,31 +70,31 @@ module.exports = {
     upsert: function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
-      if(id == 'new') {
-        id = new ObjectId();
-      } else {
-        id = ObjectId(id);
-      }
-        userModel.updateOne({_id: id}, params, {upsert: true}, (err, user) => {
+        if (id == 'new') {
+            id = new ObjectId();
+        } else {
+            id = ObjectId(id);
+        }
+        userModel.updateOne({ _id: id }, params, { upsert: true }, (err, user) => {
             if (err) {
-             res.sendStatus(500);
-           } else {
+                res.sendStatus(500);
+            } else {
                 res.send({
                     message: "success.",
                     data: {
                         user: user
                     }
                 });
-           }
+            }
         });
     },
     showBasic: function (req, res, next) {
         let id = req.params.id;
-        userModel.findOne({_id: ObjectId(id)}, {}, (err, user) => {
+        userModel.findOne({ _id: ObjectId(id) }, {}, (err, user) => {
             if (err) {
                 res.sendStatus(500);
             }
-            else if(user) {
+            else if (user) {
                 res.send({
                     message: "success.",
                     data: {
