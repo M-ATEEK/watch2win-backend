@@ -71,15 +71,18 @@ module.exports = {
         )
 
 
-        userModel.findOne({ _id: ObjectId(id) }, {}, (err, user) => {
+        userModel.findOne({ _id: ObjectId(id) }, {}, async (err, user) => {
             if (err) {
                 res.sendStatus(500);
             }
             else if (user) {
-                user.remove();
+                await user.remove();
+                const docCount = await userModel.countDocuments({});
+
                 res.send({
                     message: "success.",
                     data: {
+                        count: docCount,
                         user: user
                     }
                 });
