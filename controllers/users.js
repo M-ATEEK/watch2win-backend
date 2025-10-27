@@ -17,7 +17,7 @@ const path = require("path");
 
 module.exports = {
 
-  index: function(req, res, next) {
+  index: function (req, res, next) {
     var _page = parseInt(req.query.page) || 1;
     var _limit = parseInt(req.query.limit) || 1000;
     var query = {};
@@ -30,7 +30,7 @@ module.exports = {
       req.query.position != "undefined" &&
       req.query.position &&
       ["business", "landlord", "tenant", "all"].includes(req.query.position) ==
-        false
+      false
     ) {
       return res.send({
         success: false,
@@ -108,22 +108,22 @@ module.exports = {
     var skip = (_page - 1) * _limit;
     async.series(
       {
-        count: function(callback) {
-          User.count(function(err, count) {
+        count: function (callback) {
+          User.count(function (err, count) {
             callback(null, count);
           });
         },
-        users: function(callback) {
+        users: function (callback) {
           User.find(query, [], sortBy)
             .skip(skip)
             .limit(_limit)
             .sort({ createdAt: "desc" })
-            .exec(function(err, users) {
+            .exec(function (err, users) {
               callback(null, users);
             });
         }
       },
-      function(err, results) {
+      function (err, results) {
         return res.send({
           success: true,
           total: results.count,
@@ -135,7 +135,7 @@ module.exports = {
       }
     );
   },
-  signup: function(req, res, next) {
+  signup: function (req, res, next) {
     console.log(req.file)
     if (!req.body.email || !req.body.password) {
       res.status(200);
@@ -150,35 +150,35 @@ module.exports = {
         errors: { password: { message: "Password confirmation failed" } }
       });
     } else {
-      if(req.file){
+      if (req.file) {
         var newUser = new User({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          userName:req.body.userName,
+          userName: req.body.userName,
           email: req.body.email,
           password: req.body.password,
           roles: [req.body.role],
-          image:req.file.filename
+          image: req.file.filename
         });
       }
-      else{
+      else {
         var newUser = new User({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          userName:req.body.userName,
+          userName: req.body.userName,
           email: req.body.email,
           password: req.body.password,
           roles: [req.body.role],
         });
       }
-      
-      newUser.save(function(err) {
+
+      newUser.save(function (err) {
         if (err) {
           console.log("Error in saving new user", err);
           var errors = err.errors;
           if (err.errors == undefined) {
             errors = {
-              email: { message: "Email should be unique" }
+              email: { message: "Email and user name should be unique" }
             };
           }
           res.status(200);
@@ -214,7 +214,7 @@ module.exports = {
     }
   },
 
-  resetpassword: function(req, res, next) {
+  resetpassword: function (req, res, next) {
     console.log(req.body);
     var newPassword = req.body.new_password;
     var confirmPassword = req.body.confirm_password;
@@ -224,7 +224,7 @@ module.exports = {
         resetPasswordKey: resetToken,
         active: true
       },
-      function(err, user) {
+      function (err, user) {
         if (err) throw err;
         if (!user) {
           res.status(200);
@@ -254,13 +254,13 @@ module.exports = {
     );
   },
 
-  forgetpassword: function(req, res, next) {
+  forgetpassword: function (req, res, next) {
     User.findOne(
       {
         email: req.body.forgetpass_email,
         active: true
       },
-      function(err, user) {
+      function (err, user) {
         if (err) throw err;
         if (!user) {
           res.status(200);
@@ -282,7 +282,7 @@ module.exports = {
                 data: { user: data },
                 success: true
               });
-              
+
               // console.log(baseURL);
               emails.sendEmail(
                 '"InvenTally" <' + config.mailCredentials.auth.user + ">",
@@ -307,13 +307,13 @@ module.exports = {
     );
   },
 
-  authenticate: function(req, res, next) {
+  authenticate: function (req, res, next) {
     User.findOne(
       {
         email: req.body.email,
         active: true
       },
-      function(err, user) {
+      function (err, user) {
         if (err) throw err;
         if (!user) {
           res.status(200);
@@ -322,7 +322,7 @@ module.exports = {
             errors: { email: { message: "Email or password is wrong" } }
           });
         } else {
-          user.comparePassword(req.body.password, function(err, isMatch) {
+          user.comparePassword(req.body.password, function (err, isMatch) {
             if (isMatch && !err) {
               var token = jwt.encode(user, config.secret);
               res.json({
@@ -342,11 +342,11 @@ module.exports = {
       }
     );
   },
-  me: function(req, res, next) {
+  me: function (req, res, next) {
     res.json({ success: true, data: { user: req.user } });
   },
-  
-  update: function(req, res, next) {
+
+  update: function (req, res, next) {
     let userObject = req.body.user;
     let files = req.files;
     if (typeof userObject == "string") {
@@ -429,7 +429,7 @@ module.exports = {
     // });
   },
 
-  updateUser: function(req, res, next) {
+  updateUser: function (req, res, next) {
     let userObject = req.body.user;
     if (typeof userObject == "string") {
       userObject = JSON.parse(userObject);
