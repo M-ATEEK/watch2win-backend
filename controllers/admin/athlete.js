@@ -15,10 +15,18 @@ module.exports = {
             });
         }
         else {
-            var newAthlete = new athleteModel({
-                name: req.body.name,
-                image:req.file.filename
-            });
+            if (req.file) {
+                var newAthlete = new athleteModel({
+                    name: req.body.name,
+                    image: req.file.filename
+                });
+            }
+            else {
+                var newAthlete = new athleteModel({
+                    name: req.body.name,
+                });
+            }
+
             newAthlete.save(function (err) {
                 if (err) {
                     console.log("Error in saving new athlete", err);
@@ -39,32 +47,32 @@ module.exports = {
             });
         }
     },
-    index:async function (req, res, next) {
+    index: async function (req, res, next) {
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            const docCount=await athleteModel.countDocuments({})
+            const docCount = await athleteModel.countDocuments({})
             athleteModel.find({})
-            .skip(skip)
-            .limit(_limit)
-            .sort({created_at:-1})
-            .exec(function(err, data) {
-                if(err){
-                    res.send(err);
+                .skip(skip)
+                .limit(_limit)
+                .sort({ created_at: -1 })
+                .exec(function (err, data) {
+                    if (err) {
+                        res.send(err);
 
-                }
-                else{
-                    res.send({
-                        count:docCount,
-                        message: "athlete fethch successfully",
-                        data: {
-                            athlete: data
-                        }
-                    });
-                }
-            })
+                    }
+                    else {
+                        res.send({
+                            count: docCount,
+                            message: "athlete fethch successfully",
+                            data: {
+                                athlete: data
+                            }
+                        });
+                    }
+                })
         }
         else {
             athleteModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -82,10 +90,24 @@ module.exports = {
             })
         }
     },
-    delete: function (req, res, next) {
+    delete: async function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
-
+        await athleteModel.findOne({ _id: id }, {},
+            (err, athlete) => {
+                if (athlete.image !== undefined) {
+                    fs.unlink(`./public/img/${athlete.image}`, (err) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                        else {
+                            console.log('file dlete')
+                        }
+                    })
+                }
+                console.log(athlete)
+            }
+        )
         athleteModel.findOne({ _id: ObjectId(id) }, {}, (err, athlete) => {
             if (err) {
                 res.sendStatus(500);
@@ -103,35 +125,36 @@ module.exports = {
             }
         });
     },
-    upsert:async function (req, res, next) {
+    upsert: async function (req, res, next) {
         let id = req.params.id;
         //let params = req.body;
-        if(req.file){
-            await athleteModel.findOne({_id:id},{},
-                (err,athlete)=>{
-                    if(athlete.image!==undefined){
-                        fs.unlink(`./public/img/${athlete.image}`,(err)=>{
-                            if(err){
+        if (req.file) {
+            await athleteModel.findOne({ _id: id }, {},
+                (err, athlete) => {
+                    if (athlete.image !== undefined) {
+                        fs.unlink(`./public/img/${athlete.image}`, (err) => {
+                            if (err) {
                                 console.log(err)
                             }
-                            else{
+                            else {
                                 console.log('file dlete')
                             }
                         })
                     }
-                  
-                  console.log(athlete)
-                    
+
+                    console.log(athlete)
+
                 }
-                )
-      
-            var params={
+            )
+
+            var params = {
                 ...req.body,
-                image:req.file.filename}
-            
+                image: req.file.filename
             }
-        else if(req.file===undefined){
-            var params=req.body
+
+        }
+        else if (req.file === undefined) {
+            var params = req.body
         }
         if (id == 'new') {
             id = new ObjectId();
