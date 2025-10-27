@@ -48,6 +48,7 @@ router.post(
             .isEmpty()
             .escape(),
     ],
+    upload.single('image'),
     athleteController.upsert
 );
 

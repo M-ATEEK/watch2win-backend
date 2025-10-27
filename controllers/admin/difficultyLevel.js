@@ -36,16 +36,24 @@ module.exports = {
         }
     },
     index: function (req, res, next) {
+        var _page = parseInt(req.query.page) || 1;
+        var _limit = parseInt(req.query.limit) || 10;
+        var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            DifficultyLevelModel.find({}, (err, difficulty) => {
-                if (err) {
+            DifficultyLevelModel.find({})
+            .skip(skip)
+            .limit(_limit)
+            .sort({created_at:-1})
+            .exec(function(err, data) {
+                if(err){
                     res.send(err);
-                } else {
+                }
+                 else {
                     res.send({
                         message: "fetched successfully",
                         data: {
-                            difficulty: difficulty
+                            difficulty: data
                         }
                     });
                 }

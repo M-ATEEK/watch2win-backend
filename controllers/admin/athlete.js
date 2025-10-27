@@ -1,6 +1,8 @@
 const athleteModel = require('../../models/athlete-model');
 var ObjectId = require("mongodb").ObjectID;
 const { validationResult } = require('express-validator');
+var fs = require("fs");
+
 module.exports = {
 
     create: function (req, res, next) {
@@ -15,7 +17,7 @@ module.exports = {
         else {
             var newAthlete = new athleteModel({
                 name: req.body.name,
-                image: req.file ? req.file.filename : undefined
+                image:req.file.filename
             });
             newAthlete.save(function (err) {
                 if (err) {
@@ -37,22 +39,32 @@ module.exports = {
             });
         }
     },
-    index: function (req, res, next) {
+    index:async function (req, res, next) {
+        var _page = parseInt(req.query.page) || 1;
+        var _limit = parseInt(req.query.limit) || 10;
+        var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
-
         if (searchField === undefined) {
-            athleteModel.find({}, (err, athlete) => {
-                if (err) {
+            const docCount=await athleteModel.countDocuments({})
+            athleteModel.find({})
+            .skip(skip)
+            .limit(_limit)
+            .sort({created_at:-1})
+            .exec(function(err, data) {
+                if(err){
                     res.send(err);
-                } else {
+
+                }
+                else{
                     res.send({
-                        message: "athlete fetched successfully",
+                        count:docCount,
+                        message: "athlete fethch successfully",
                         data: {
-                            athlete: athlete
+                            athlete: data
                         }
                     });
                 }
-            });
+            })
         }
         else {
             athleteModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -91,9 +103,36 @@ module.exports = {
             }
         });
     },
-    upsert: function (req, res, next) {
+    upsert:async function (req, res, next) {
         let id = req.params.id;
-        let params = req.body;
+        //let params = req.body;
+        if(req.file){
+            await athleteModel.findOne({_id:id},{},
+                (err,athlete)=>{
+                    if(athlete.image!==undefined){
+                        fs.unlink(`./public/img/${athlete.image}`,(err)=>{
+                            if(err){
+                                console.log(err)
+                            }
+                            else{
+                                console.log('file dlete')
+                            }
+                        })
+                    }
+                  
+                  console.log(athlete)
+                    
+                }
+                )
+      
+            var params={
+                ...req.body,
+                image:req.file.filename}
+            
+            }
+        else if(req.file===undefined){
+            var params=req.body
+        }
         if (id == 'new') {
             id = new ObjectId();
         } else {
@@ -131,4 +170,3 @@ module.exports = {
         });
     }
 }
-

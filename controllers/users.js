@@ -1,22 +1,22 @@
 var User = require("../models/users-model.js");
-// var Admin = require("../models/admin-model.js"); // Removed in cleanup
+// var Admin = require("../models/admin-model.js");
 const bcrypt = require("bcryptjs");
 var jwt = require("jwt-simple");
 var emails = require("../services/email");
 
 nodeMailer = require("nodemailer");
-// const SubScriber = require("../models/subscriber-model"); // Removed in cleanup
+// const SubScriber = require("../models/subscriber-model");
 const config = require("../config");
 var async = require("async");
 const shortid = require("shortid");
-// const uniqueString = require("unique-string"); // ES module issue, replaced with crypto
-const crypto = require("crypto");
+const uniqueString = require("unique-string");
 var fs = require("fs");
 var mv = require("mv");
 var emails = require("../services/email");
 const path = require("path");
 
 module.exports = {
+
   index: function(req, res, next) {
     var _page = parseInt(req.query.page) || 1;
     var _limit = parseInt(req.query.limit) || 1000;
@@ -150,15 +150,28 @@ module.exports = {
         errors: { password: { message: "Password confirmation failed" } }
       });
     } else {
-      var newUser = new User({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        userName: req.body.userName,
-        email: req.body.email,
-        password: req.body.password,
-        roles: [req.body.role],
-        image: req.file ? req.file.filename : undefined
-      });
+      if(req.file){
+        var newUser = new User({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          userName:req.body.userName,
+          email: req.body.email,
+          password: req.body.password,
+          roles: [req.body.role],
+          image:req.file.filename
+        });
+      }
+      else{
+        var newUser = new User({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          userName:req.body.userName,
+          email: req.body.email,
+          password: req.body.password,
+          roles: [req.body.role],
+        });
+      }
+      
       newUser.save(function(err) {
         if (err) {
           console.log("Error in saving new user", err);
@@ -206,7 +219,6 @@ module.exports = {
     var newPassword = req.body.new_password;
     var confirmPassword = req.body.confirm_password;
     var resetToken = req.body.reset_token;
-
     User.findOne(
       {
         resetPasswordKey: resetToken,
@@ -340,81 +352,81 @@ module.exports = {
     if (typeof userObject == "string") {
       userObject = JSON.parse(userObject);
     }
-    Admin.findById(req.params.id, (err, user) => {
-      if (err) {
-        res.send({
-          data: { user: user },
-          success: false
-        });
-      } else {
-        let deletedAvatar = user.avatar;
-        user.firstName = userObject.firstName;
-        user.lastName = userObject.lastName;
-        user.companyName = userObject.companyName;
-        user.mobileNumber = userObject.mobileNumber;
-        user.company_detail = userObject.company_detail;
-        user.company_city = userObject.company_city;
+    // Admin.findById(req.params.id, (err, user) => {
+    //   if (err) {
+    //     res.send({
+    //       data: { user: user },
+    //       success: false
+    //     });
+    //   } else {
+    //     let deletedAvatar = user.avatar;
+    //     user.firstName = userObject.firstName;
+    //     user.lastName = userObject.lastName;
+    //     user.companyName = userObject.companyName;
+    //     user.mobileNumber = userObject.mobileNumber;
+    //     user.company_detail = userObject.company_detail;
+    //     user.company_city = userObject.company_city;
 
-        if (req.files != null && req.files.avatar != undefined) {
-          let file = req.files.avatar;
-          if (file != undefined) {
-            let imageName = file.name;
-            let indexTypeImage = imageName.lastIndexOf(".");
-            let imageExtension = imageName.substring(
-              indexTypeImage,
-              imageName.length
-            );
-            let imageNewName = crypto.randomBytes(16).toString('hex') + imageExtension;
-            let imageSavePath = imageNewName;
-            let tempPath = file.tempFilePath;
-            let targetPath = "../backend/public/img/users/" + imageSavePath;
-            mv(tempPath, targetPath, { mkdirp: true }, function(err) {
-              if (err) console.log(err);
-              else {
-                user.avatar = imageNewName;
-                user.save((err, data) => {
-                  if (err) {
-                    res.send({
-                      data: { user: data },
-                      success: false
-                    });
-                  } else {
-                    // Remove old pic
-                    fs.unlink(
-                      path.join(
-                        __dirname,
-                        "../public/img/users/" + deletedAvatar
-                      ),
-                      function(err) {
-                        if (err) return console.log(err);
-                      }
-                    );
-                    res.send({
-                      data: { user: data },
-                      success: true
-                    });
-                  }
-                });
-              }
-            });
-          }
-        } else {
-          user.save((err, data) => {
-            if (err) {
-              res.send({
-                data: { user: data },
-                success: false
-              });
-            } else {
-              res.send({
-                data: { user: data },
-                success: true
-              });
-            }
-          });
-        }
-      }
-    });
+    //     if (req.files != null && req.files.avatar != undefined) {
+    //       let file = req.files.avatar;
+    //       if (file != undefined) {
+    //         let imageName = file.name;
+    //         let indexTypeImage = imageName.lastIndexOf(".");
+    //         let imageExtension = imageName.substring(
+    //           indexTypeImage,
+    //           imageName.length
+    //         );
+    //         let imageNewName = uniqueString() + imageExtension;
+    //         let imageSavePath = imageNewName;
+    //         let tempPath = file.tempFilePath;
+    //         let targetPath = "../backend/public/img/users/" + imageSavePath;
+    //         mv(tempPath, targetPath, { mkdirp: true }, function(err) {
+    //           if (err) console.log(err);
+    //           else {
+    //             user.avatar = imageNewName;
+    //             user.save((err, data) => {
+    //               if (err) {
+    //                 res.send({
+    //                   data: { user: data },
+    //                   success: false
+    //                 });
+    //               } else {
+    //                 // Remove old pic
+    //                 fs.unlink(
+    //                   path.join(
+    //                     __dirname,
+    //                     "../public/img/users/" + deletedAvatar
+    //                   ),
+    //                   function(err) {
+    //                     if (err) return console.log(err);
+    //                   }
+    //                 );
+    //                 res.send({
+    //                   data: { user: data },
+    //                   success: true
+    //                 });
+    //               }
+    //             });
+    //           }
+    //         });
+    //       }
+    //     } else {
+    //       user.save((err, data) => {
+    //         if (err) {
+    //           res.send({
+    //             data: { user: data },
+    //             success: false
+    //           });
+    //         } else {
+    //           res.send({
+    //             data: { user: data },
+    //             success: true
+    //           });
+    //         }
+    //       });
+    //     }
+    //   }
+    // });
   },
 
   updateUser: function(req, res, next) {
