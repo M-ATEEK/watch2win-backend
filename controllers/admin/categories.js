@@ -107,15 +107,17 @@ module.exports = {
             }
         )
 
-        categoriesModel.findOne({ _id: ObjectId(id) }, {}, (err, category) => {
+        categoriesModel.findOne({ _id: ObjectId(id) }, {}, async (err, category) => {
             if (err) {
                 res.sendStatus(500);
             }
             else if (category) {
-                category.remove();
+                await category.remove();
+                const docCount = await categoriesModel.countDocuments({});
                 res.send({
                     message: "success.",
                     data: {
+                        count: docCount,
                         category: category
                     }
                 });

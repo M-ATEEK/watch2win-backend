@@ -108,15 +108,17 @@ module.exports = {
                 console.log(athlete)
             }
         )
-        athleteModel.findOne({ _id: ObjectId(id) }, {}, (err, athlete) => {
+        athleteModel.findOne({ _id: ObjectId(id) }, {}, async (err, athlete) => {
             if (err) {
                 res.sendStatus(500);
             }
             else if (athlete) {
-                athlete.remove();
+                await athlete.remove();
+                const docCount = await athleteModel.countDocuments({});
                 res.send({
                     message: "success.",
                     data: {
+                        count: docCount,
                         athlete: athlete
                     }
                 });
