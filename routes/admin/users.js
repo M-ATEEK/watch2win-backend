@@ -10,6 +10,16 @@ var config = require("../../config");
 const validate = require("../../middleware/validate");
 const fileUpload = require("express-fileupload");
 const formidable = require('express-formidable');
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, './public/img/')
+  },
+  filename: function(req, file, cb) {
+   cb(null, new Date().toISOString() + file.originalname);
+  }
+})
+const upload = multer({storage: storage})
 
 router.post(
     "/admin/docusignAccessToken",
@@ -134,6 +144,7 @@ router.post(
             .isEmpty()
             .escape(),
     ],
+    upload.single('image'),
     userController.upsert
 );
 
