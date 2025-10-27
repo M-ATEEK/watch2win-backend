@@ -14,6 +14,7 @@ module.exports = {
         else {
             var newCategory = new categoriesModel({
                 name: req.body.name,
+                image: req.file ? req.file.filename : undefined
             });
             newCategory.save(function (err) {
                 if (err) {
