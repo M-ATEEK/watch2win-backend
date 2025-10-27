@@ -1,9 +1,10 @@
-const categoriesModel = require('../../models/categories-model');
+const athleteModel = require('../../models/athlete-model');
 var ObjectId = require("mongodb").ObjectID;
 const { validationResult } = require('express-validator');
 module.exports = {
 
     create: function (req, res, next) {
+
         if (!req.body.name) {
             res.status(200);
             res.json({
@@ -12,12 +13,12 @@ module.exports = {
             });
         }
         else {
-            var newCategory = new categoriesModel({
+            var newAthlete = new athleteModel({
                 name: req.body.name,
             });
-            newCategory.save(function (err) {
+            newAthlete.save(function (err) {
                 if (err) {
-                    console.log("Error in saving new category", err);
+                    console.log("Error in saving new athlete", err);
                     res.status(200);
                     return res.json({
                         success: false,
@@ -28,8 +29,8 @@ module.exports = {
                 res.json({
                     success: true,
                     data: {
-                        category: newCategory,
-                        message: "category with ID_${data._id} saved successfully!"
+                        athlete: newAthlete,
+                        message: "athlete with ID_${data._id} saved successfully!"
                     }
                 });
             });
@@ -37,29 +38,30 @@ module.exports = {
     },
     index: function (req, res, next) {
         let searchField = req.query.search;
+
         if (searchField === undefined) {
-            categoriesModel.find({}, (err, category) => {
+            athleteModel.find({}, (err, athlete) => {
                 if (err) {
                     res.send(err);
                 } else {
                     res.send({
-                        message: "categories fetched successfully",
+                        message: "athlete fetched successfully",
                         data: {
-                            category: category
+                            athlete: athlete
                         }
                     });
                 }
             });
         }
         else {
-            categoriesModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            athleteModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {
                     res.send({
-                        message: "category searched successfully",
+                        message: "athlete searched successfully",
                         data: {
-                            category: data
+                            athlete: data
                         }
                     });
                 }
@@ -67,20 +69,20 @@ module.exports = {
             })
         }
     },
-    delete: function (req, res, AlbinoTebex) {
+    delete: function (req, res, next) {
         let id = req.params.id;
         let params = req.body;
 
-        categoriesModel.findOne({ _id: ObjectId(id) }, {}, (err, category) => {
+        athleteModel.findOne({ _id: ObjectId(id) }, {}, (err, athlete) => {
             if (err) {
                 res.sendStatus(500);
             }
-            else if (category) {
-                category.remove();
+            else if (athlete) {
+                athlete.remove();
                 res.send({
                     message: "success.",
                     data: {
-                        category: category
+                        athlete: athlete
                     }
                 });
             } else {
@@ -96,14 +98,14 @@ module.exports = {
         } else {
             id = ObjectId(id);
         }
-        categoriesModel.updateOne({ _id: id }, params, { upsert: true }, (err, category) => {
+        athleteModel.updateOne({ _id: id }, params, { upsert: true }, (err, athlete) => {
             if (err) {
                 res.sendStatus(500);
             } else {
                 res.send({
                     message: "success.",
                     data: {
-                        category: category
+                        athlete: athlete
                     }
                 });
             }
@@ -111,15 +113,15 @@ module.exports = {
     },
     show: function (req, res, next) {
         let id = req.params.id;
-        categoriesModel.findOne({ _id: ObjectId(id) }, {}, (err, category) => {
+        athleteModel.findOne({ _id: ObjectId(id) }, {}, (err, athlete) => {
             if (err) {
                 res.sendStatus(500);
             }
-            else if (category) {
+            else if (athlete) {
                 res.send({
                     message: "success.",
                     data: {
-                        category: category
+                        athlete: athlete
                     }
                 });
             } else {
@@ -128,3 +130,4 @@ module.exports = {
         });
     }
 }
+
