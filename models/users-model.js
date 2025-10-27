@@ -21,6 +21,10 @@ const UsersSchema = new Schema({
   lastName: {
     type: String
   },
+  userName: {
+    type: String,
+    unique: true
+  },
   email: {
     type: String,
     trim: true,
