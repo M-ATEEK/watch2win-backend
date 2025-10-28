@@ -179,7 +179,7 @@ module.exports = {
     // me api, get all the user info from users collection of the current loged in user, get api, same as show also return activities aray
     me: async function(req,res,next){
       let user = await userModel.aggregate([
-            { $match: { _id: ObjectId('5f5925967a5d0242fb4513eb') } },
+            { $match: { _id: ObjectId(req.user._id) } },
             { "$unwind": "$watchLaterDrillVideos" },
             { $lookup: { from: "drills", localField: "watchLaterDrillVideos", foreignField: "videos._id", as: "watchLaterDrillVideo"  } },
             { "$unwind": "$watchLaterDrillVideo" },
