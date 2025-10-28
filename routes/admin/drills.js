@@ -9,20 +9,28 @@ const { check } = require("express-validator");
 const multer=require('multer');
 const storage=multer.diskStorage({
   destination:function(req,file,cb){
-    cb(null,'./public/img/')
+    cb(null,'./public/drills/')
   },
   filename:function(req,file,cb){
    cb(null, new Date().toISOString() + file.originalname);
   }
 })
 const upload=multer({storage:storage})
+var cpUpload = upload.fields([{ name: 'thumbnail', maxCount: 2 }, { name: 'video' }])
 
 router.post(
     "/admin/drills",
-    upload.single('thumbnail'),
+    cpUpload,
     passport.authenticate("jwt", { session: false }),
     //userPolicy.isAllowed,
     drillsController.create
+);
+router.post(
+    "/admin/drills/upload",
+    cpUpload,
+    passport.authenticate("jwt", { session: false }),
+    //userPolicy.isAllowed,
+    drillsController.videos
 );
 router.get(
     "/admin/drills",
@@ -33,6 +41,7 @@ router.get(
 
 router.post(
     "/admin/drills/:id",
+    cpUpload,
     passport.authenticate("jwt", { session: false }),
     // languagePolicy.isAllowed,
     [
@@ -41,7 +50,6 @@ router.post(
             .isEmpty()
             .escape(),
     ],
-    upload.single('thumbnail'),
     drillsController.upsert
 );
 router.delete(
@@ -56,5 +64,18 @@ router.get(
    // languagePolicy.isAllowed,
    drillsController.show
 );
+
+router.post(
+    "/user/points",
+    passport.authenticate("jwt", { session: false }),
+    drillsController.points
+
+)
+router.post(
+    "/totallikes",
+    passport.authenticate("jwt", { session: false }),
+    drillsController.totalLikes
+
+)
 
 module.exports=router;
