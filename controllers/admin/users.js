@@ -1,4 +1,6 @@
 const userModel = require('../../models/users-model');
+const athleteModel = require('../../models/athlete-model');
+const categoriesModel = require('../../models/categories-model');
 var ObjectId = require("mongodb").ObjectID;
 const { validationResult } = require('express-validator');
 const fs = require('fs')
@@ -181,5 +183,107 @@ module.exports = {
                 res.sendStatus(500);
             }
         });
+    },
+    addToFvorite: function (req, res, next) {
+        let isAdded = req.body.isAdded
+        let video = req.body.favouriteDrillVideos
+        if (isAdded) {
+            userModel.update(
+                { _id: req.user._id },
+                { $push: { favouriteDrillVideos: video } },
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "video added to favorite"
+                            }
+                        });
+                    }
+                }
+            )
+        }
+        else {
+            userModel.update(
+                { _id: req.user._id },
+                { $pull: { favouriteDrillVideos: { $in: video } } },
+                // { multi: true }
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "video deleted from favorite"
+                            }
+                        });
+                    }
+                })
+        }
+    },
+    addToWatchLater: function (req, res, next) {
+        let isAdded = req.body.isAdded
+        let video = req.body.watchLaterDrillVideos
+        if (isAdded) {
+            userModel.update(
+                { _id: req.user._id },
+                { $push: { watchLaterDrillVideos: video } },
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "video added to watch later"
+                            }
+                        });
+                    }
+                }
+            )
+        }
+        else {
+            userModel.update(
+                { _id: req.user._id },
+                { $pull: { watchLaterDrillVideos: { $in: video } } },
+                // { multi: true }
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "video remove from watch later"
+                            }
+                        });
+                    }
+                })
+        }
+
+    },
+    search: async function (req, res, next) {
+        let keyword = req.query.keyword;
+        let users = await userModel.find({ firstName: { $regex: keyword, $options: '$i' } })
+        let category = await categoriesModel.find({ name: { $regex: keyword, $options: '$i' } })
+        let athlete = await athleteModel.find({ name: { $regex: keyword, $options: '$i' } })
+        res.send({
+            data: {
+                users: users,
+                categories: category,
+                athlete: athlete
+            }
+        })
     }
 }

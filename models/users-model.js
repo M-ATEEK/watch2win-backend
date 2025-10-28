@@ -51,6 +51,12 @@ const UsersSchema = new Schema({
   image: {
     type: String
   },
+  favouriteDrillVideos: [{
+    type: Schema.Types.ObjectId
+  }],
+  watchLaterDrillVideos: [{
+    type: Schema.Types.ObjectId
+  }],
   code: {
     type: String
   },
