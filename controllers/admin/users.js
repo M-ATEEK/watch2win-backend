@@ -181,10 +181,10 @@ module.exports = {
         let userObj = req.user
         let aggregation = [{ $match: { _id: ObjectId(req.user._id) } }];
         if (userObj.watchLaterDrillVideos && userObj.watchLaterDrillVideos.length > 0) {
-            let agg = [{ "$unwind": "$watchLaterDrillVideos" },
+            let agg = [{ "$unwind": {path: "$watchLaterDrillVideos", preserveNullAndEmptyArrays: true} },
             { $lookup: { from: "drills", localField: "watchLaterDrillVideos", foreignField: "videos._id", as: "watchLaterDrillVideo"  } },
-            { "$unwind": "$watchLaterDrillVideo" },
-            { "$unwind": "$watchLaterDrillVideo.videos" },
+            { "$unwind": {path: "$watchLaterDrillVideo", preserveNullAndEmptyArrays: true} },
+            { "$unwind": {path: "$watchLaterDrillVideo.videos", preserveNullAndEmptyArrays: true} },
             { $match: { $expr:{ $eq:["$watchLaterDrillVideos", "$watchLaterDrillVideo.videos._id"] } } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {watchLaterDrillVideo: "$watchLaterDrillVideo.videos"} ] } } },
             {"$group": {"_id": "$_id","watchLaterDrillVideo": { "$push": "$watchLaterDrillVideo" }, "document":{"$first":"$$ROOT"} }},
@@ -197,10 +197,10 @@ module.exports = {
         }
 
         if (userObj.favouriteDrillVideos && userObj.favouriteDrillVideos.length > 0) {
-            let agg = [{ "$unwind": "$favouriteDrillVideos" },
+            let agg = [{ "$unwind": {path: "$favouriteDrillVideos", preserveNullAndEmptyArrays: true} },
             { $lookup: { from: "drills", localField: "favouriteDrillVideos", foreignField: "videos._id", as: "favouriteDrillVideo"  } },
-            { "$unwind": "$favouriteDrillVideo" },
-            { "$unwind": "$favouriteDrillVideo.videos" },
+            { "$unwind": {path: "$favouriteDrillVideo", preserveNullAndEmptyArrays: true} },
+            { "$unwind": {path: "$favouriteDrillVideo.videos", preserveNullAndEmptyArrays: true} },
             { $match: { $expr:{ $eq:["$favouriteDrillVideos", "$favouriteDrillVideo.videos._id"] } } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {favouriteDrillVideo: "$favouriteDrillVideo.videos"} ] } } },
             {"$group": {"_id": "$_id","favouriteDrillVideo": { "$push": "$favouriteDrillVideo" }, "document":{"$first":"$$ROOT"} }},
@@ -213,7 +213,7 @@ module.exports = {
         }
 
         if (userObj.watchedVideos && userObj.watchedVideos.length > 0) {
-            let agg = [{ "$unwind": "$watchedVideos" },
+            let agg = [{ "$unwind": {path: "$watchedVideos", preserveNullAndEmptyArrays: true} },
             { $lookup: { from: "drills", localField: "watchedVideos.drill_id", foreignField: "_id", as: "watchedVideos.drill_id"  } },
             { $lookup: { from: "difficultylevels", localField: "watchedVideos.diffculty_id", foreignField: "_id", as: "watchedVideos.diffculty_id"  } },
             { $lookup: { from: "speedlevels", localField: "watchedVideos.speed_level_id", foreignField: "_id", as: "watchedVideos.speed_level_id"  } },
