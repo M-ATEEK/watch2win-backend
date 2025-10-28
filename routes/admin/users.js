@@ -207,7 +207,7 @@ router.post(
   usersController.createAdmin
 );
 
-// New endpoints from athlete-drills commit b49b720a
+// New endpoints from athlete-drills commits
 router.post(
     "/user/favoriteVideo",
     passport.authenticate("jwt", { session: false }),
@@ -223,5 +223,18 @@ router.get(
     passport.authenticate("jwt", { session: false }),
     usersController.search
 );
+router.get(
+    "/user/detail",
+    passport.authenticate("jwt", { session: false }),
+    usersController.me
+);
+router.post(
+    "/googlelogin",
+    usersController.googlelogin
+)
+router.post(
+    "/facebooklogin",
+    usersController.facebooklogin
+)
 
 module.exports = router;
