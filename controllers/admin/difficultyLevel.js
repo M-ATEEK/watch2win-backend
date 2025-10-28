@@ -36,13 +36,36 @@ module.exports = {
         }
     },
     index: async function (req, res, next) {
+        let all= req.query.all;
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            const docCount = await DifficultyLevelModel.countDocuments({});
-            DifficultyLevelModel.find({})
+            if(all){
+                const docCount = await DifficultyLevelModel.countDocuments({})
+
+                DifficultyLevelModel.find({})
+                .sort({created_at:-1})
+                .exec(function(err, data) {
+                    if(err){
+                        res.send(err);
+                    }
+                     else {
+                        res.send({
+                            count:docCount,
+                            message: "ALL fetched successfully",
+                            data: {
+                                difficulty: data
+                            }
+                        });
+                    }
+                })
+            }
+            else{
+                const docCount = await DifficultyLevelModel.countDocuments({})
+
+                DifficultyLevelModel.find({})
             .skip(skip)
             .limit(_limit)
             .sort({created_at:-1})
@@ -52,14 +75,16 @@ module.exports = {
                 }
                  else {
                     res.send({
+                        count:docCount,
                         message: "fetched successfully",
                         data: {
-                            count: docCount,
                             difficulty: data
                         }
                     });
                 }
-            });
+            })
+            }
+            
         }
         else {
             DifficultyLevelModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
