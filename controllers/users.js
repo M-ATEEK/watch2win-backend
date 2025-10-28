@@ -285,12 +285,12 @@ module.exports = {
 
               // console.log(baseURL);
               emails.sendEmail(
-                '"InvenTally" <' + config.mailCredentials.auth.user + ">",
+                '"Email" <' + config.mailCredentials.auth.user + ">",
                 "" + user.email,
                 "Please reset your password",
                 "reset-password-email",
                 {
-                  link: `${config.appURL}/reset_password/${user.resetPasswordKey}`
+                  link: `${user.resetPasswordKey}`
                 }
               );
               // emails.sendEmail(
