@@ -251,5 +251,10 @@ router.post(
       passport.authenticate("jwt", { session: false }),
       usersController.loginUser
   )
+  router.post(
+    "/followUser", 
+    passport.authenticate("jwt", { session: false }),
+    usersController.followUser
+  )
 
 module.exports = router;
