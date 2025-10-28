@@ -54,6 +54,29 @@ const UsersSchema = new Schema({
   },
   // add watchedVideos array { video_id, watch_count,drill_id}
   // add points Number type, set default 0,
+  watchedVideos:[{
+    drill_id:{
+         type:String
+    },
+    diffculty_id:{
+      type:String
+    },
+    speed_level_id:{
+         type:String
+    },
+       video_id:{
+      type:String
+    },
+    watch_count:{
+      type:Number,
+      default:1
+    }
+  }
+  ],
+  points:{
+     type:Number,
+     default:0
+  },
   source:{
      type:String,
      enum:["google","local","facebook"]
