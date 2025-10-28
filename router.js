@@ -8,6 +8,7 @@ var difficultyRouter=require("./routes/admin/difficulty");
 var speedRouter=require("./routes/admin/speed");
 var subscriptionRouter=require("./routes/admin/subscription");
 var drillsRouter=require("./routes/admin/drills");
+var activityRouter=require("./routes/admin/activity");
 
 module.exports = function(app) {
   app.use('/api/v1', [
@@ -20,6 +21,7 @@ module.exports = function(app) {
     difficultyRouter,
     speedRouter,
     subscriptionRouter,
-    drillsRouter
+    drillsRouter,
+    activityRouter
   ]);
 };
