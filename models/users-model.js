@@ -113,6 +113,12 @@ const UsersSchema = new Schema({
   watchLaterDrillVideos: [{
     type: Schema.Types.ObjectId
   }],
+  following: [
+     {
+      type: Schema.Types.ObjectId,
+      
+     }
+  ],
   code: {
     type: String
   },
