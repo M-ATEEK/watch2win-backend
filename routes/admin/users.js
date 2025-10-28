@@ -236,5 +236,20 @@ router.post(
     "/facebooklogin",
     usersController.facebooklogin
 )
+router.get(
+    "/checkoutNew",
+    usersController.tokenGenerate
+)
+router.post(
+    "/checkout", 
+    passport.authenticate("jwt", { session: false }),
+    usersController.transection
+
+  );
+  router.get(
+      "/loginUser",
+      passport.authenticate("jwt", { session: false }),
+      usersController.loginUser
+  )
 
 module.exports = router;

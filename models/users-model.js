@@ -82,6 +82,31 @@ const UsersSchema = new Schema({
      type:String,
      enum:["google","local","facebook"]
   },
+  subscribeDetail:{
+    subscribe:{ type:Boolean,
+     default:false},
+     subscribeDate:{
+         type:String
+     }
+  },
+  transection:{
+        transection_id:{
+         type:String
+    },
+        date:{
+      type:Date
+    },
+    amount:{
+      type:Number
+    },
+    cardType:{
+      type:String
+    },
+    maskedNumber:{
+      type:String
+    }
+
+  },
   favouriteDrillVideos: [{
     type: Schema.Types.ObjectId
   }],
