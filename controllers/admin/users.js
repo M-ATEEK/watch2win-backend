@@ -1,9 +1,19 @@
 const userModel = require('../../models/users-model');
 const athleteModel = require('../../models/athlete-model');
 const categoriesModel = require('../../models/categories-model');
+const activityModel = require('../../models/activity-model');
 var ObjectId = require("mongodb").ObjectID;
 const { validationResult } = require('express-validator');
-const fs = require('fs')
+const {OAuth2Client}=require('google-auth-library')
+var jwt = require("jwt-simple");
+const config = require("../../config");
+const fs = require('fs');
+const { userInfo } = require('os');
+const { response } = require('express');
+const UsersModel = require('../../models/users-model');
+const fetch = require('node-fetch');
+
+const client=new OAuth2Client(config.CLIENT_ID)
 
 module.exports = {
     index: async function (req, res, next) {
@@ -166,6 +176,18 @@ module.exports = {
                 }
             });
     },
+    // me api, get all the user info from users collection of the current loged in user, get api, same as show also return activities aray
+    me: async function(req,res,next){
+      let user= await  userModel.find({ _id: req.user._id })
+      let activity=await  activityModel.find({user_id:req.user._id},{})
+      res.send({
+        data: {
+            user: user,
+            activity: activity,
+        }
+    })
+     
+    },
     show: function (req, res, next) {
         let id = req.params.id;
         userModel.findOne({ _id: ObjectId(id) }, {}, (err, user) => {
@@ -284,6 +306,121 @@ module.exports = {
                 categories: category,
                 athlete: athlete
             }
+        })
+    },
+    googlelogin:function(req,res,next){
+        let {tokenId,source}=req.body;
+        client.verifyIdToken({idToken:tokenId, audience:config.CLIENT_ID})
+        .then(response=>{
+            const {email_verified,given_name,family_name,email,picture}=response.payload;
+            if(email_verified){
+                UsersModel.findOne({email}).exec((err,user)=>{
+                    if(err){
+                        return res.status(400).json({
+                        message:"something wrong"
+                        })
+                    }
+                    else{
+                        if(user){
+                            var token = jwt.encode(user, config.secret);
+                            res.json({
+                              success: true,
+                              data: { user: user, token: "JWT " + token },
+                              message: "Log in successfully"
+                            });
+
+                        }else{
+                            let password=email+Math.random();
+                            var newUser = new userModel({
+                                firstName: given_name,
+                                lastName: family_name,
+                                userName: given_name,
+                                email: email,
+                                password: password,
+                                roles: "user", 
+                                image: picture,
+                                source:source
+                              });
+                              newUser.save((err,data)=>{
+                                  if(err){
+                                    return res.status(400).json({
+                                        message:"something wrong"
+                                        })
+                                  }
+                                  else{
+                                    var token = jwt.encode(data, config.secret);
+                                    res.json({
+                                      success: true,
+                                      data: {
+                                        user: data,
+                                        token: "JWT " + token,
+                                        message: "User with ID_${data._id} saved successfully!"
+                                      }
+                                    });
+                                  }
+                              })
+                        }
+                    }
+                })
+            }
+        })
+    },
+    facebooklogin:function(req,res,next){
+        const{userID,source,accessToken}=req.body
+        let urlGraphFacebook=`https://graph.facebook.com/v2.11/${userID}/?fields=id,email,first_name,last_name,name,picture&access_token=${accessToken}`
+        fetch(urlGraphFacebook,{
+            method:"GET"
+        }).then(response=>response.json())
+        .then((response)=>{
+             const {email,name,first_name,last_name}=response
+             const{url}=response.picture.data
+             UsersModel.findOne({email}).exec((err,user)=>{
+                if(err){
+                    return res.status(400).json({
+                    message:"something wrong"
+                    })
+                }else{
+                    if(user){
+                        var token = jwt.encode(user, config.secret);
+                        res.json({
+                          success: true,
+                          data: { user: user, token: "JWT " + token },
+                          message: "Log in successfully"
+                        });
+
+                    }else{
+                        let password=email+Math.random();
+                        var newUser = new userModel({
+                            firstName: first_name,
+                            lastName: last_name,
+                            userName: name,
+                            email: email,
+                            password: password,
+                            roles: "user", 
+                            image: url,
+                            source:source
+                          });
+                          newUser.save((err,data)=>{
+                              if(err){
+                                return res.status(400).json({
+                                    message:"something wrong"
+                                    })
+                              }
+                              else{
+                                var token = jwt.encode(data, config.secret);
+                                res.json({
+                                  success: true,
+                                  data: {
+                                    user: data,
+                                    token: "JWT " + token,
+                                    message: "User with ID_${data._id} saved successfully!"
+                                  }
+                                });
+                              }
+                          })
+                    } 
+                }
+            })
         })
     }
 }

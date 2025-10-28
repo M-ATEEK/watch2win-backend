@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = {
+  CLIENT_ID:process.env.CLIENT_ID || "478158737536-ehhhrrodvdmnn123c0m2n74bn573fav4.apps.googleusercontent.com",
   siteURL: process.env.SITE_URL || "http://localhost",
   appURL: process.env.APP_URL || "https://inventally.com",
   port: process.env.PORT || "8000",
