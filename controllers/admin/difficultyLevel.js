@@ -14,6 +14,7 @@ module.exports = {
         else {
             var newDifficulty = new DifficultyLevelModel({
                 name: req.body.name,
+                points:req.body.points
             });
             newDifficulty.save(function (err) {
                 if (err) {
