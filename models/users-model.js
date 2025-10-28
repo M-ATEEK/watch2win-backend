@@ -23,7 +23,8 @@ const UsersSchema = new Schema({
   },
   userName: {
     type: String,
-    unique: true
+    unique: true,
+    lowercase:true
   },
   email: {
     type: String,
@@ -50,6 +51,12 @@ const UsersSchema = new Schema({
   },
   image: {
     type: String
+  },
+  // add watchedVideos array { video_id, watch_count,drill_id}
+  // add points Number type, set default 0,
+  source:{
+     type:String,
+     enum:["google","local","facebook"]
   },
   favouriteDrillVideos: [{
     type: Schema.Types.ObjectId

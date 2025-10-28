@@ -9,6 +9,7 @@ const DifficultyLevelSchema = new Schema({
     type: String,
     required: true
   },
+  // add points field here 20
   createdAt: {
     type: Date,
     default: Date.now
