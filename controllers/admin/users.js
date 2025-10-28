@@ -2,18 +2,28 @@ const userModel = require('../../models/users-model');
 const athleteModel = require('../../models/athlete-model');
 const categoriesModel = require('../../models/categories-model');
 const activityModel = require('../../models/activity-model');
+const subscriptios = require('../../models/subscriptions-model')
 var ObjectId = require("mongodb").ObjectID;
 const { validationResult } = require('express-validator');
-const {OAuth2Client}=require('google-auth-library')
+const { OAuth2Client } = require('google-auth-library')
 var jwt = require("jwt-simple");
 const config = require("../../config");
 const fs = require('fs');
 const { userInfo } = require('os');
 const { response } = require('express');
+var moment = require('moment');
 const UsersModel = require('../../models/users-model');
 const fetch = require('node-fetch');
+var braintree = require('braintree');
 
-const client=new OAuth2Client(config.CLIENT_ID)
+const gateway = new braintree.BraintreeGateway({
+    environment: braintree.Environment.Sandbox,
+    merchantId: "s7c9tzx9vtfq8zsp",
+    publicKey: "5xk3yb84xxprw66n",
+    privateKey: "4e6f3d602fd826873a2f813801c4ef17"
+});
+
+const client = new OAuth2Client(config.CLIENT_ID)
 
 module.exports = {
     index: async function (req, res, next) {
@@ -356,7 +366,7 @@ module.exports = {
             }
         })
     },
-    googlelogin:function(req,res,next){
+    googlelogin: function(req,res,next){
         let {tokenId,source}=req.body;
         client.verifyIdToken({idToken:tokenId, audience:config.CLIENT_ID})
         .then(response=>{
@@ -413,7 +423,7 @@ module.exports = {
             }
         })
     },
-    facebooklogin:function(req,res,next){
+    facebooklogin: function(req,res,next){
         const{userID,source,accessToken}=req.body
         let urlGraphFacebook=`https://graph.facebook.com/v2.11/${userID}/?fields=id,email,first_name,last_name,name,picture&access_token=${accessToken}`
         fetch(urlGraphFacebook,{
@@ -469,6 +479,72 @@ module.exports = {
                     } 
                 }
             })
+        })
+    },
+    tokenGenerate: function (req, res) {
+        gateway.clientToken.generate({}, (err, response) => {
+            res.send({ token: response.clientToken });
+        });
+    },
+    transection: async function (req, res) {
+        const id = req.user._id
+        const data = req.body;
+        const sub = await subscriptios.findOne({ _id: data.sub_id })
+        await gateway.transaction.sale({
+            amount: `${sub.price}`,
+            paymentMethodNonce: data.data.nonce,
+            deviceData: data.data.detail,
+            options: {
+                submitForSettlement: true
+            }
+        }, async (err, result) => {
+            if (err) {
+                res.send(500)
+            }
+            else {
+                var start = moment(req.user.subscribeDetail && req.user.subscribeDetail.subscribeDate);
+                var current = moment().startOf('minute');
+                const duration = moment.duration(current.diff(start)).asDays()
+                if (start && duration <= '30') {
+                    res.send({
+                        message: 'already subscribe'
+                    })
+                }
+                else {
+                    if (result.success) {
+                        let body = {
+                            subscribeDetail: {
+                                subscribe: true,
+                                subscribeDate: moment().format()
+                            },
+                            transection: {
+                                transection_id: result.transaction.id,
+                                date: result.transaction.createdAt,
+                                amount: result.transaction.amount,
+                                cardType: result.transaction.creditCard.cardType,
+                                maskedNumber: result.transaction.creditCard.maskedNumber
+                            },
+                        }
+                        await userModel.findOneAndUpdate({ _id: id }, body, { new: true })
+                        res.json({
+                            message: result.success,
+                            result: result
+                        })
+                    }
+                    else {
+                        res.json({
+                            message: result.success,
+                            result: result
+                        })
+                    }
+                }
+            }
+        });
+    },
+    loginUser: function(req,res){
+        const loginUser = req.user
+        res.json({
+            loginUser
         })
     }
 }
