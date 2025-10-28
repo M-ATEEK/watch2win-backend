@@ -178,33 +178,55 @@ module.exports = {
     },
     // me api, get all the user info from users collection of the current loged in user, get api, same as show also return activities aray
     me: async function(req,res,next){
-      let user = await userModel.aggregate([
-            { $match: { _id: ObjectId(req.user._id) } },
-            { "$unwind": "$watchLaterDrillVideos" },
+        let userObj = req.user
+        let aggregation = [{ $match: { _id: ObjectId(req.user._id) } }];
+        if (userObj.watchLaterDrillVideos && userObj.watchLaterDrillVideos.length > 0) {
+            let agg = [{ "$unwind": "$watchLaterDrillVideos" },
             { $lookup: { from: "drills", localField: "watchLaterDrillVideos", foreignField: "videos._id", as: "watchLaterDrillVideo"  } },
             { "$unwind": "$watchLaterDrillVideo" },
             { "$unwind": "$watchLaterDrillVideo.videos" },
             { $match: { $expr:{ $eq:["$watchLaterDrillVideos", "$watchLaterDrillVideo.videos._id"] } } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {watchLaterDrillVideo: "$watchLaterDrillVideo.videos"} ] } } },
-            { "$group": {"_id": "$_id","watchLaterDrillVideo": { "$push": "$watchLaterDrillVideo" }, "document":{"$first":"$$ROOT"} }},
+            {"$group": {"_id": "$_id","watchLaterDrillVideo": { "$push": "$watchLaterDrillVideo" }, "document":{"$first":"$$ROOT"} }},
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {watchLaterDrillVideo: "$watchLaterDrillVideo"} ] } } },
+            ];
 
-            { "$unwind": "$favouriteDrillVideos" },
+            agg.forEach(ag => {
+                aggregation.push(ag);
+            });
+        }
+
+        if (userObj.favouriteDrillVideos && userObj.favouriteDrillVideos.length > 0) {
+            let agg = [{ "$unwind": "$favouriteDrillVideos" },
             { $lookup: { from: "drills", localField: "favouriteDrillVideos", foreignField: "videos._id", as: "favouriteDrillVideo"  } },
             { "$unwind": "$favouriteDrillVideo" },
             { "$unwind": "$favouriteDrillVideo.videos" },
             { $match: { $expr:{ $eq:["$favouriteDrillVideos", "$favouriteDrillVideo.videos._id"] } } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {favouriteDrillVideo: "$favouriteDrillVideo.videos"} ] } } },
-            { "$group": {"_id": "$_id","favouriteDrillVideo": { "$push": "$favouriteDrillVideo" }, "document":{"$first":"$$ROOT"} }},
+            {"$group": {"_id": "$_id","favouriteDrillVideo": { "$push": "$favouriteDrillVideo" }, "document":{"$first":"$$ROOT"} }},
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {favouriteDrillVideo: "$favouriteDrillVideo"} ] } } },
-            
-            { "$unwind": "$watchedVideos" },
+            ];
+
+            agg.forEach(ag => {
+                aggregation.push(ag);
+            });
+        }
+
+        if (userObj.watchedVideos && userObj.watchedVideos.length > 0) {
+            let agg = [{ "$unwind": "$watchedVideos" },
             { $lookup: { from: "drills", localField: "watchedVideos.drill_id", foreignField: "_id", as: "watchedVideos.drill_id"  } },
             { $lookup: { from: "difficultylevels", localField: "watchedVideos.diffculty_id", foreignField: "_id", as: "watchedVideos.diffculty_id"  } },
             { $lookup: { from: "speedlevels", localField: "watchedVideos.speed_level_id", foreignField: "_id", as: "watchedVideos.speed_level_id"  } },
-            { "$group": {"_id": "$_id","watchedVideos": { "$push": "$watchedVideos" }, "document":{"$first":"$$ROOT"} }},
+            {"$group": {"_id": "$_id","watchedVideos": { "$push": "$watchedVideos" }, "document":{"$first":"$$ROOT"} }},
             { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {watchedVideos: "$watchedVideos"} ] } } }
-        ]);
+            ];
+
+            agg.forEach(ag => {
+                aggregation.push(ag);
+            });
+        }
+
+    let user = await userModel.aggregate(aggregation);
       let activity=await  activityModel.find({user_id:req.user._id},{})
       res.send({
         data: {
