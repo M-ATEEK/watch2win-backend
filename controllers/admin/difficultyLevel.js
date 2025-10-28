@@ -35,12 +35,13 @@ module.exports = {
             });
         }
     },
-    index: function (req, res, next) {
+    index: async function (req, res, next) {
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
+            const docCount = await DifficultyLevelModel.countDocuments({});
             DifficultyLevelModel.find({})
             .skip(skip)
             .limit(_limit)
@@ -53,6 +54,7 @@ module.exports = {
                     res.send({
                         message: "fetched successfully",
                         data: {
+                            count: docCount,
                             difficulty: data
                         }
                     });
