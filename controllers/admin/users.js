@@ -236,7 +236,19 @@ module.exports = {
             });
         }
 
-    let user = await userModel.aggregate(aggregation);
+       if (userObj.following && userObj.following.length > 0) {
+            let agg = [{ "$unwind": {path: "$following", preserveNullAndEmptyArrays: true} },
+            { $lookup: { from: "users", localField: "following", foreignField: "_id", as: "following"  } },
+            {"$group": {"_id": "$_id","following": { "$push": "$following" }, "document":{"$first":"$$ROOT"} }},
+            { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {following: "$following"} ] } } }
+            ];
+
+            agg.forEach(ag => {
+                aggregation.push(ag);
+            });
+        } 
+
+    let user = await userModel.aggregate(aggregation)
       let activity=await  activityModel.find({user_id:req.user._id},{})
       res.send({
         data: {
@@ -352,6 +364,51 @@ module.exports = {
                 })
         }
 
+    },
+    followUser:function(req,res){
+        let isAdded = req.body.isAdded
+        let userId = req.body.following
+        console.log(req.body.following)
+        if (isAdded) {
+            userModel.update(
+                { _id: req.user._id },
+                { $push: { following: userId } },
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "follow user added"
+                            }
+                        });
+                    }
+                }
+            )
+        }
+        else {
+            userModel.update(
+                { _id: req.user._id },
+                { $pull: { following: { $in: userId } } },
+                // { multi: true } 
+                (err, done) => {
+                    if (err) {
+
+                    }
+                    else {
+                        res.json({
+                            success: true,
+                            data: {
+                                drills: done,
+                                message: "follow user deleted"
+                            }
+                        });
+                    }
+                })
+        }
     },
     search: async function (req, res, next) {
         let keyword = req.query.keyword;
