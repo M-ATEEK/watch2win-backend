@@ -65,7 +65,8 @@ const UsersSchema = new Schema({
          type:String
     },
        video_id:{
-      type:String
+      type:String,
+      ref:"drills"
     },
     watch_count:{
       type:Number,
