@@ -43,10 +43,10 @@ const UsersSchema = new Schema({
     type: [
       {
         type: String,
-        enum: ["admin"]
+        enum: ["admin", "user"]
       }
     ],
-    default: ["admin"]
+    default: ["user"]
   },
   image: {
     type: String
