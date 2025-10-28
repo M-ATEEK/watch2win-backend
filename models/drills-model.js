@@ -33,17 +33,6 @@ const DrillSchema = new Schema({
 			speedLevel: {
 				type: Schema.Types.ObjectId,
 				ref: "speedlevel",
-			},
-			duration:{
-			 type:Number
-			},
-			totalLikes:{
-				type:Number,
-				default:0
-			},
-			isPremium: {
-				type: Boolean,
-				default: false,
 			} 
 	  }], 
 	isPremium: {
