@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var userController = require("../../controllers/admin/users");
+var usersController = require("../../controllers/admin/users");
 var docusignController = require("../../controllers/admin/docusign");
 
 var passport = require("passport");
@@ -55,14 +55,14 @@ router.get(
   "/admin/users",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.index
+  usersController.index
 );
 
 router.get(
   "/admin/searchUsers",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.searchAdminUsers
+  usersController.searchAdminUsers
 );
 
 router.get(
@@ -76,35 +76,35 @@ router.get(
       .isLength({ min: 3 })
   ],
   validate,
-  userController.search
+  usersController.search
 );
 
 router.post(
   "/admin/users",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.create
+  usersController.create
 );
 
 router.put(
   "/admin/users/:id",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.update
+  usersController.update
 );
 
 router.get(
   "/admin/users/:id",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.show
+  usersController.show
 );
 
 router.delete(
   "/admin/users/:id",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.delete
+  usersController.delete
 );
 
 // Additional simplified routes from commit d72cad37
@@ -112,14 +112,14 @@ router.get(
     "/admin/users-basic",
     passport.authenticate("jwt", { session: false }),
     //userPolicy.isAllowed,
-    userController.indexBasic
+    usersController.indexBasic
 );
 
 router.delete(
     "/admin/users-basic/:id",
     passport.authenticate("jwt", { session: false }),
    // languagePolicy.isAllowed,
-    userController.deleteBasic
+    usersController.deleteBasic
 );
 
 router.post(
@@ -145,21 +145,21 @@ router.post(
             .escape(),
     ],
     upload.single('image'),
-    userController.upsert
+    usersController.upsert
 );
 
 router.get(
     "/admin/users-basic/:id",
     passport.authenticate("jwt", { session: false }),
    // languagePolicy.isAllowed,
-    userController.showBasic
+    usersController.showBasic
 );
 
 router.get(
   "/admin/validate-token",
   passport.authenticate("jwt", { session: false }),
   userPolicy.isAllowed,
-  userController.validateToken
+  usersController.validateToken
 );
 
 router.post(
@@ -175,7 +175,7 @@ router.post(
       .isEmpty()
       .escape()
   ],
-  userController.authenticate
+  usersController.authenticate
 );
 
 router.post(
@@ -204,7 +204,24 @@ router.post(
       .isIn(config.roles.adminRoles)
       .escape()
   ],
-  userController.createAdmin
+  usersController.createAdmin
+);
+
+// New endpoints from athlete-drills commit b49b720a
+router.post(
+    "/user/favoriteVideo",
+    passport.authenticate("jwt", { session: false }),
+    usersController.addToFvorite
+),
+ router.post(
+        "/user/watchLater",
+        passport.authenticate("jwt", { session: false }),
+        usersController.addToWatchLater
+    )
+router.get(
+    "/user/search",
+    passport.authenticate("jwt", { session: false }),
+    usersController.search
 );
 
 module.exports = router;
