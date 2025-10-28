@@ -56,16 +56,16 @@ const UsersSchema = new Schema({
   // add points Number type, set default 0,
   watchedVideos:[{
     drill_id:{
-         type:String
+         type:ObjectId
     },
     diffculty_id:{
-      type:String
+      type:ObjectId
     },
     speed_level_id:{
-         type:String
+         type:ObjectId
     },
        video_id:{
-      type:String,
+      type:ObjectId,
       ref:"drills"
     },
     watch_count:{
