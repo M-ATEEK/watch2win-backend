@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css?family=Comfortaa&display=swap");
+
+body {
+  margin: 0;
+  font-family: "Helvetica", cursive;
+}
+
+.header,
+.footer {
+  background: rgba(241, 240, 240, 0);
+  padding: 25px 10px;
+  min-height: 17vh;
+  position: relative;
+}
+
+.header .logo {
+  position: absolute;
+  top: 45%;
+  width: 100%;
+  text-align: left;
+}
+
+.header .logo img {
+  margin-top: 40px;
+  width: 250px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.footer p {
+  font-weight: 700;
+  position: absolute;
+  top: 45%;
+  width: 100%;
+  text-align: center;
+  color: #24357c;
+  font-size: 22px;
+}
+
+.section {
+  text-align: center;
+  position: relative;
+  min-height: 66vh;
+}
+
+.section > * {
+  position: absolute;
+  top: 45%;
+}
+
+a {
+  text-decoration: none;
+}
+
+.btn-native,
+.btn-native:hover,
+.btn-native:focus,
+.btn-native:active {
+  background: #24357c;
+  border: none;
+  border-radius: 25px;
+  padding: 15px 35px;
+  color: white;
+}
+
+.blue {
+  color: #24357c;
+}
+
+.lead {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.mt-5 {
+  margin-top: 15px;
+}
+
+.item-group {
+  text-align: center;
+  width: 100%;
+}
+
+.item-group > * {
+  border-radius: 20px;
+  display: inline;
+  padding: 10px 15px;
+  background-color: #24357c;
+  color: white;
+  margin: 0;
+}
+
+.item-group > * {
+  font-weight: bolder;
+}
+
+.item-group > * > .heading {
+  font-weight: lighter;
+  font-size: 13px;
+}
