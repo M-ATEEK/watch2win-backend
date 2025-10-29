@@ -586,6 +586,48 @@ module.exports = {
             }
         });
     },
+    subscribeByMonth: async function (req, res) {
+        const jan = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 1, 1), $gte: new Date(moment().format('YYYY'), 0, 1 + 1) } }).countDocuments()
+        const feb = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 2, 1), $gte: new Date(moment().format('YYYY'), 1, 1 + 1) } }).countDocuments()
+        const mar = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 3, 1), $gte: new Date(moment().format('YYYY'), 2, 1 + 1) } }).countDocuments()
+        const apr = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 4, 1), $gte: new Date(moment().format('YYYY'), 3, 1 + 1) } }).countDocuments()
+        const may = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 5, 1), $gte: new Date(moment().format('YYYY'), 4, 1 + 1) } }).countDocuments()
+        const jun = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 6, 1), $gte: new Date(moment().format('YYYY'), 5, 1 + 1) } }).countDocuments()
+        const jul = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 7, 1), $gte: new Date(moment().format('YYYY'), 6, 1 + 1) } }).countDocuments()
+        const aug = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 8, 1), $gte: new Date(moment().format('YYYY'), 7, 1 + 1) } }).countDocuments()
+        const sep = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 9, 1), $gte: new Date(moment().format('YYYY'), 8, 1 + 1) } }).countDocuments()
+        const oct = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 10, 1), $gte: new Date(moment().format('YYYY'), 9, 1 + 1) } }).countDocuments()
+        const nov = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 11, 1), $gte: new Date(moment().format('YYYY'), 10, 1 + 1) } }).countDocuments()
+        const dec = await userModel.find({ 'subscribeDetail.subscribe': true, "subscribeDetail.subscribeDate": { $lte: new Date(moment().format('YYYY'), 12, 1), $gte: new Date(moment().format('YYYY'), 11, 1 + 1) } }).countDocuments()
+
+        res.send({
+            jan,
+            feb,
+            mar,
+            apr,
+            may,
+            jun,
+            jul,
+            aug,
+            sep,
+            oct,
+            nov,
+            dec
+        })
+    },
+    subscribers: function (req, res) {
+        userModel.find({ 'subscribeDetail.subscribe': true }).countDocuments()
+            .exec(function (err, subscriberes) {
+                if (err) {
+                    res.send(500)
+                }
+                else {
+                    res.send({
+                        totalsubscribers: subscriberes
+                    })
+                }
+            })
+    },
     loginUser: function(req,res){
         const loginUser = req.user
         res.json({
