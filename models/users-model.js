@@ -107,12 +107,26 @@ const UsersSchema = new Schema({
     }
 
   },
-  favouriteDrillVideos: [{
-    type: Schema.Types.ObjectId
-  }],
-  watchLaterDrillVideos: [{
-    type: Schema.Types.ObjectId
-  }],
+  favouriteDrillVideos: [
+    {
+      drill_id: {
+        type: ObjectId
+      },
+      video_id: {
+        type: ObjectId
+      }
+    }
+  ],
+  watchLaterDrillVideos: [
+    {
+      drill_id: {
+        type: ObjectId
+      },
+      video_id: {
+        type: ObjectId
+      }
+    }
+  ],
   following: [
      {
       type: Schema.Types.ObjectId,

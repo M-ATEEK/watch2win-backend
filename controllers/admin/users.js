@@ -190,15 +190,11 @@ module.exports = {
     me: async function(req,res,next){
         let userObj = req.user
         let aggregation = [{ $match: { _id: ObjectId(req.user._id) } }];
-        if (userObj.watchLaterDrillVideos && userObj.watchLaterDrillVideos.length > 0) {
-            let agg = [{ "$unwind": {path: "$watchLaterDrillVideos", preserveNullAndEmptyArrays: true} },
-            { $lookup: { from: "drills", localField: "watchLaterDrillVideos", foreignField: "videos._id", as: "watchLaterDrillVideo"  } },
-            { "$unwind": {path: "$watchLaterDrillVideo", preserveNullAndEmptyArrays: true} },
-            { "$unwind": {path: "$watchLaterDrillVideo.videos", preserveNullAndEmptyArrays: true} },
-            { $match: { $expr:{ $eq:["$watchLaterDrillVideos", "$watchLaterDrillVideo.videos._id"] } } },
-            { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {watchLaterDrillVideo: "$watchLaterDrillVideo.videos"} ] } } },
-            {"$group": {"_id": "$_id","watchLaterDrillVideo": { "$push": "$watchLaterDrillVideo" }, "document":{"$first":"$$ROOT"} }},
-            { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {watchLaterDrillVideo: "$watchLaterDrillVideo"} ] } } },
+        if (userObj.favouriteDrillVideos && userObj.favouriteDrillVideos.length > 0) {
+            let agg = [{ "$unwind": {path: "$favouriteDrillVideos", preserveNullAndEmptyArrays: true} },
+            { $lookup: { from: "drills", localField: "favouriteDrillVideos.drill_id", foreignField: "_id", as: "favouriteDrillVideos.drill_id"  } },
+            {"$group": {"_id": "$_id","favouriteDrillVideos": { "$push": "$favouriteDrillVideos" }, "document":{"$first":"$$ROOT"} }},
+            { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {favouriteDrillVideos: "$favouriteDrillVideos"} ] } } }
             ];
 
             agg.forEach(ag => {
@@ -206,15 +202,11 @@ module.exports = {
             });
         }
 
-        if (userObj.favouriteDrillVideos && userObj.favouriteDrillVideos.length > 0) {
-            let agg = [{ "$unwind": {path: "$favouriteDrillVideos", preserveNullAndEmptyArrays: true} },
-            { $lookup: { from: "drills", localField: "favouriteDrillVideos", foreignField: "videos._id", as: "favouriteDrillVideo"  } },
-            { "$unwind": {path: "$favouriteDrillVideo", preserveNullAndEmptyArrays: true} },
-            { "$unwind": {path: "$favouriteDrillVideo.videos", preserveNullAndEmptyArrays: true} },
-            { $match: { $expr:{ $eq:["$favouriteDrillVideos", "$favouriteDrillVideo.videos._id"] } } },
-            { $replaceRoot: { newRoot: { $mergeObjects: [ "$$ROOT", {favouriteDrillVideo: "$favouriteDrillVideo.videos"} ] } } },
-            {"$group": {"_id": "$_id","favouriteDrillVideo": { "$push": "$favouriteDrillVideo" }, "document":{"$first":"$$ROOT"} }},
-            { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {favouriteDrillVideo: "$favouriteDrillVideo"} ] } } },
+        if (userObj.watchLaterDrillVideos && userObj.watchLaterDrillVideos.length > 0) {
+            let agg = [{ "$unwind": {path: "$watchLaterDrillVideos", preserveNullAndEmptyArrays: true} },
+            { $lookup: { from: "drills", localField: "watchLaterDrillVideos.drill_id", foreignField: "_id", as: "watchLaterDrillVideos.drill_id"  } },
+            {"$group": {"_id": "$_id","watchLaterDrillVideos": { "$push": "$watchLaterDrillVideos" }, "document":{"$first":"$$ROOT"} }},
+            { $replaceRoot: { newRoot: { $mergeObjects: [ "$document", {watchLaterDrillVideos: "$watchLaterDrillVideos"} ] } } }
             ];
 
             agg.forEach(ag => {
@@ -278,11 +270,12 @@ module.exports = {
     },
     addToFvorite: function (req, res, next) {
         let isAdded = req.body.isAdded
-        let video = req.body.favouriteDrillVideos
+        let video_id = req.body.video_id
+        let drill_id = req.body.drill_id
         if (isAdded) {
             userModel.update(
                 { _id: req.user._id },
-                { $push: { favouriteDrillVideos: video } },
+                { $push: { favouriteDrillVideos: { video_id, drill_id } } },
                 (err, done) => {
                     if (err) {
 
@@ -302,7 +295,7 @@ module.exports = {
         else {
             userModel.update(
                 { _id: req.user._id },
-                { $pull: { favouriteDrillVideos: { $in: video } } },
+                { $pull: { favouriteDrillVideos: { video_id, drill_id } } },
                 // { multi: true }
                 (err, done) => {
                     if (err) {
@@ -322,11 +315,12 @@ module.exports = {
     },
     addToWatchLater: function (req, res, next) {
         let isAdded = req.body.isAdded
-        let video = req.body.watchLaterDrillVideos
+        let video_id = req.body.video_id
+        let drill_id = req.body.drill_id
         if (isAdded) {
             userModel.update(
                 { _id: req.user._id },
-                { $push: { watchLaterDrillVideos: video } },
+                { $push: { watchLaterDrillVideos: { video_id, drill_id } } },
                 (err, done) => {
                     if (err) {
 
@@ -346,7 +340,7 @@ module.exports = {
         else {
             userModel.update(
                 { _id: req.user._id },
-                { $pull: { watchLaterDrillVideos: { $in: video } } },
+                { $pull: { watchLaterDrillVideos: { video_id: ObjectId(video_id), drill_id: ObjectId(drill_id) } } },
                 // { multi: true }
                 (err, done) => {
                     if (err) {
