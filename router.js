@@ -9,6 +9,8 @@ var speedRouter=require("./routes/admin/speed");
 var subscriptionRouter=require("./routes/admin/subscription");
 var drillsRouter=require("./routes/admin/drills");
 var activityRouter=require("./routes/admin/activity");
+var earningRouter=require("./routes/admin/earning");
+
 
 module.exports = function(app) {
   app.use('/api/v1', [
@@ -22,6 +24,8 @@ module.exports = function(app) {
     speedRouter,
     subscriptionRouter,
     drillsRouter,
-    activityRouter
+    activityRouter,
+    earningRouter
+
   ]);
 };

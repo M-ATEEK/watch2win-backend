@@ -48,12 +48,32 @@ module.exports = {
         }
     },
     index: async function (req, res, next) {
+        let all=req.query.all
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            const docCount = await categoriesModel.countDocuments({})
+            if(all){
+                const docCount = await categoriesModel.countDocuments({})
+                categoriesModel.find({})
+                    .sort({ created_at: -1 })
+                    .exec(function (err, category) {
+                        if (err) {
+                            res.send(err);
+                        } else {
+                            res.send({
+                                count: docCount,
+                                message: "All categories fetched successfully",
+                                data: {
+                                    category: category
+                                }
+                            });
+                        }
+                    })
+            }
+            else{
+                const docCount = await categoriesModel.countDocuments({})
             categoriesModel.find({})
                 .skip(skip)
                 .limit(_limit)
@@ -71,6 +91,8 @@ module.exports = {
                         });
                     }
                 })
+            }
+            
         }
         else {
             categoriesModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -90,39 +112,35 @@ module.exports = {
     },
     delete: async function (req, res, next) {
         let id = req.params.id;
-        let params = req.body;
-        await categoriesModel.findOne({ _id: id }, {},
-            (err, category) => {
-                if (category.image !== undefined) {
-                    fs.unlink(`./public/img/${category.image}`, (err) => {
-                        if (err) {
-                            console.log(err)
-                        }
-                        else {
-                            console.log('file dlete')
-                        }
-                    })
-                }
-                console.log(category)
-            }
-        )
 
-        categoriesModel.findOne({ _id: ObjectId(id) }, {}, async (err, category) => {
+        categoriesModel.findOne({ _id: ObjectId(id) }, {}, async(err, category) => {
             if (err) {
                 res.sendStatus(500);
             }
             else if (category) {
-                await category.remove();
+               await category.remove();
+               if (category.image !== undefined) {
+               await fs.unlink(`./public/img/${category.image}`, (err) => {
+                    if (err) {
+                        console.log(err)
+                    }
+                    else {
+                        console.log('file dlete')
+                    }
+                })
+            }
                 const docCount = await categoriesModel.countDocuments({});
                 res.send({
                     message: "success.",
                     data: {
-                        count: docCount,
+                        count:docCount,
                         category: category
                     }
                 });
             } else {
-                res.sendStatus(500);
+                res.send({
+                    message:"category doest not exist "
+                });
             }
         });
     },

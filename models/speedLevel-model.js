@@ -10,12 +10,12 @@ const SpeedLevelSchema = new Schema({
     required: true
   },
   points:{
-    type: Number,
+    type: Number, // 30
     required: true
   },
   condition:{
-    type: String,
-    required: true
+    type: Number,
+    required: true // 3
   },
   createdAt: {
     type: Date,

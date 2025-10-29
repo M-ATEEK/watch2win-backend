@@ -157,7 +157,7 @@ module.exports = {
           userName: req.body.userName,
           email: req.body.email,
           password: req.body.password,
-          roles: [req.body.role],
+          roles: [req.body.roles], 
           image: req.file.filename
         });
       }
@@ -168,7 +168,7 @@ module.exports = {
           userName: req.body.userName,
           email: req.body.email,
           password: req.body.password,
-          roles: [req.body.role],
+          roles: [req.body.roles],
         });
       }
 
