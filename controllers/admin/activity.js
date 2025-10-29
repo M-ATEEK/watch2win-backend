@@ -55,5 +55,28 @@ module.exports = {
                     });
                 }
             })
-    }
+    },
+    getActivity:function(req,res){
+        let id=req.params.id;
+       activityModel.find({user_id:id})
+       .populate({
+           path:"user_id",
+           model:"user"
+       })
+       .populate({
+           path:"drill_id",
+           model:"drills"
+       })
+       .sort({createdAt:-1})
+       .exec(function(err,activity){
+           if(err){
+               res.send(err)
+           }
+           else{
+               res.send({
+                   activity:activity
+               })
+           }
+       })
+       }
 }
