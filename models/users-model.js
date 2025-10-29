@@ -86,7 +86,7 @@ const UsersSchema = new Schema({
     subscribe:{ type:Boolean,
      default:false},
      subscribeDate:{
-         type:String
+         type:Date
      }
   },
   transection:{
