@@ -7,10 +7,10 @@ const DrillSchema = new Schema({
 	name: {
 		type: String,
 		required: true,
-	  },
-	thumbnail:{
-		type:String
-	  },
+  },
+  thumbnail:{
+	type:String
+  },
 	athlete: {
 		type: Schema.Types.ObjectId,
 		ref: "athlete",
@@ -22,19 +22,30 @@ const DrillSchema = new Schema({
 	difficultyLevel: {
 		type: Schema.Types.ObjectId,
 		ref: "difficultylevel",
-	  },
-	   videos:[{
-		 thumbnail:{
-			  type:String
-			},
-	        video:{
-				type:String 
-			}, 
-			speedLevel: {
-				type: Schema.Types.ObjectId,
-				ref: "speedlevel",
-			} 
-	  }], 
+  },
+   videos:[{
+	 thumbnail:{
+		  type:String
+		},
+        video:{
+			type:String	
+		}, 
+		speedLevel: {
+			type: Schema.Types.ObjectId,
+			ref: "speedlevel",
+		},
+		duration:{
+		 type:Number
+		},
+		totalLikes:{
+			type:Number,
+			default:0
+		},
+		isPremium: {
+			type: Boolean,
+			default: false,
+		} 
+  }], 
 	isPremium: {
 		type: Boolean,
 		default: false,

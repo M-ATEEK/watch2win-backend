@@ -48,31 +48,55 @@ module.exports = {
         }
     },
     index: async function (req, res, next) {
+        let all=req.query.all;
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            const docCount = await athleteModel.countDocuments({})
-            athleteModel.find({})
-                .skip(skip)
-                .limit(_limit)
-                .sort({ created_at: -1 })
-                .exec(function (err, data) {
-                    if (err) {
-                        res.send(err);
-
-                    }
-                    else {
-                        res.send({
-                            count: docCount,
-                            message: "athlete fethch successfully",
-                            data: {
-                                athlete: data
-                            }
-                        });
-                    }
-                })
+            if(all){
+                const docCount = await athleteModel.countDocuments({})
+                athleteModel.find({})
+                    .sort({ created_at: -1 })
+                    .exec(function (err, data) {
+                        if (err) {
+                            res.send(err);
+    
+                        }
+                        else {
+                            res.send({
+                                count: docCount,
+                                message: "All athlete fethch successfully",
+                                data: {
+                                    athlete: data
+                                }
+                            });
+                        }
+                    })
+            }
+            else{
+                const docCount = await athleteModel.countDocuments({})
+                athleteModel.find({})
+                    .skip(skip)
+                    .limit(_limit)
+                    .sort({ created_at: -1 })
+                    .exec(function (err, data) {
+                        if (err) {
+                            res.send(err);
+    
+                        }
+                        else {
+                            res.send({
+                                count: docCount,
+                                message: "athlete fethch successfully",
+                                data: {
+                                    athlete: data
+                                }
+                            });
+                        }
+                    }) 
+            }
+           
         }
         else {
             athleteModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -92,11 +116,14 @@ module.exports = {
     },
     delete: async function (req, res, next) {
         let id = req.params.id;
-        let params = req.body;
-        await athleteModel.findOne({ _id: id }, {},
-            (err, athlete) => {
+        athleteModel.findOne({ _id: ObjectId(id) }, {}, async(err, athlete) => {
+            if (err) {
+                res.sendStatus(500);
+            }
+            else if (athlete) {
+                await athlete.remove();
                 if (athlete.image !== undefined) {
-                    fs.unlink(`./public/img/${athlete.image}`, (err) => {
+                  await  fs.unlink(`./public/img/${athlete.image}`, (err) => {
                         if (err) {
                             console.log(err)
                         }
@@ -105,25 +132,18 @@ module.exports = {
                         }
                     })
                 }
-                console.log(athlete)
-            }
-        )
-        athleteModel.findOne({ _id: ObjectId(id) }, {}, async (err, athlete) => {
-            if (err) {
-                res.sendStatus(500);
-            }
-            else if (athlete) {
-                await athlete.remove();
                 const docCount = await athleteModel.countDocuments({});
                 res.send({
                     message: "success.",
                     data: {
-                        count: docCount,
+                        count:docCount,
                         athlete: athlete
                     }
                 });
             } else {
-                res.sendStatus(500);
+                res.send({
+                    message:"athlete does not xist"
+                });
             }
         });
     },

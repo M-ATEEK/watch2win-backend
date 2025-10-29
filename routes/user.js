@@ -6,16 +6,17 @@ var passport = require("passport");
 var userPolicy = require("../policies/users.policy");
 const { check } = require("express-validator");
 const validate = require("../middleware/validate");
-const multer = require('multer');
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, './public/img/')
+const multer=require('multer');
+const storage=multer.diskStorage({
+  destination:function(req,file,cb){
+    cb(null,'./public/img/')
   },
-  filename: function(req, file, cb) {
+  filename:function(req,file,cb){
    cb(null, new Date().toISOString() + file.originalname);
   }
 })
-const upload = multer({storage: storage})
+const upload=multer({storage:storage})
+
 
 router.get(
   "/users",
@@ -69,7 +70,7 @@ router.get(
 //   userController.updateCurrent
 // );
 router.post("/authenticate", userController.authenticate);
-router.post("/signup", upload.single('image'), userController.signup);
+router.post("/signup",upload.single('image'), userController.signup);
 router.post("/forgetpassword", userController.forgetpassword);
 router.post("/resetpassword", userController.resetpassword);
 
@@ -78,7 +79,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   userController.me
 );
-// router.post("/subscribe", userController.subscribe); // Function removed in cleanup
+// router.post("/subscribe", userController.subscribe);
 router.put(
   "/users/:id",
   fileUpload({
