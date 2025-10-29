@@ -251,6 +251,18 @@ router.post(
       passport.authenticate("jwt", { session: false }),
       usersController.loginUser
   )
+
+router.get(
+  "/admin/subscriberbymonth", 
+  passport.authenticate("jwt", { session: false }),
+  usersController.subscribeByMonth
+)
+
+router.get(
+  "/admin/totalsubscriber", 
+  passport.authenticate("jwt", { session: false }),
+  usersController.subscribers
+)
   router.post(
     "/user/followUser", 
     passport.authenticate("jwt", { session: false }),
