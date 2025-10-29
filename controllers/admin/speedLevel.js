@@ -37,28 +37,52 @@ module.exports = {
             });
         }
     },
-    index: function (req, res, next) {
+    index: async function (req, res, next) {
+        let all=req.query.all;
         var _page = parseInt(req.query.page) || 1;
         var _limit = parseInt(req.query.limit) || 10;
         var skip = (_page - 1) * _limit;
         let searchField = req.query.search;
         if (searchField === undefined) {
-            SpeedLevelModel.find({})
-            .skip(skip)
-            .limit(_limit)
-            .sort({created_at:-1})
-            .exec(function(err, data) {
-                if (err) {
-                    res.send(err);
-                } else {
-                    res.send({
-                        message: "fetched successfully",
-                        data: {
-                            speedLevel: data
-                        }
-                    });
-                }
-            });
+            if(all){
+                const docCount = await SpeedLevelModel.countDocuments({})
+                SpeedLevelModel.find({})
+                .sort({created_at:-1})
+                .exec(function(err, data) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.send({
+                            count:docCount,
+                            message: "All fetched successfully",
+                            data: {
+                                speedLevel: data
+                            }
+                        });
+                    }
+                });     
+            }
+            else{
+                const docCount = await SpeedLevelModel.countDocuments({})
+                SpeedLevelModel.find({})
+                .skip(skip)
+                .limit(_limit)
+                .sort({created_at:-1})
+                .exec(function(err, data) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.send({
+                            count:docCount,
+                            message: "fetched successfully",
+                            data: {
+                                speedLevel: data
+                            }
+                        });
+                    }
+                });
+            }
+            
         }
         else {
             SpeedLevelModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
@@ -93,7 +117,9 @@ module.exports = {
                     }
                 });
             } else {
-                res.sendStatus(500);
+                res.send({
+                    message:"speedLevel does not exist"
+                });
             }
         });
     },
