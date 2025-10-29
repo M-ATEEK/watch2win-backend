@@ -7,6 +7,7 @@ const ActivitySchema = new Schema({
     user_id: {
         type: String,
         required: true,
+        ref:"user"
     },
     type: {
         type: String
