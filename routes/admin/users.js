@@ -252,7 +252,7 @@ router.post(
       usersController.loginUser
   )
   router.post(
-    "/followUser", 
+    "/user/followUser", 
     passport.authenticate("jwt", { session: false }),
     usersController.followUser
   )
