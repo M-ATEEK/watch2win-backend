@@ -550,7 +550,7 @@ module.exports = {
                 var start = moment(req.user.subscribeDetail && req.user.subscribeDetail.subscribeDate);
                 var current = moment().startOf('minute');
                 const duration = moment.duration(current.diff(start)).asDays()
-                if (start && duration <= '30') {
+                if (req.user.subscribeDetail && req.user.subscribeDetail.subscribe && duration <= '30') {
                     res.send({
                         message: 'already subscribe'
                     })
@@ -560,7 +560,7 @@ module.exports = {
                         let body = {
                             subscribeDetail: {
                                 subscribe: true,
-                                subscribeDate: moment().format()
+                                subscribeDate: result.transaction.createdAt
                             },
                             transection: {
                                 transection_id: result.transaction.id,
