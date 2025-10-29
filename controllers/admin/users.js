@@ -15,6 +15,7 @@ var moment = require('moment');
 const UsersModel = require('../../models/users-model');
 const fetch = require('node-fetch');
 var braintree = require('braintree');
+var emails = require("../../services/email");
 
 const gateway = new braintree.BraintreeGateway({
     environment: braintree.Environment.Sandbox,
@@ -584,6 +585,16 @@ module.exports = {
                             },
                         }
                         await userModel.findOneAndUpdate({ _id: id }, body, { new: true })
+                        // Send email here
+                        let email = req.user.email;
+                        emails.sendEmail(
+                            '"Elite" <' + config.mailCredentials.auth.user + ">",
+                            "" + req.user.email,
+                            "Invoice",
+                            "report-order-invoice-email",
+                            { invoice: {transaction_id: result.transaction.id, user: req.user, amount: sub.price} },
+                            false
+                          );
                         res.json({
                             message: result.success,
                             result: result
