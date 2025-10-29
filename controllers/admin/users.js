@@ -235,13 +235,26 @@ module.exports = {
         } 
 
     let user = await userModel.aggregate(aggregation)
-      let activity=await  activityModel.find({user_id:req.user._id},{})
-      res.send({
-        data: {
-            user: user,
-            activity: activity,
-        }
-    })
+
+        
+        let activity = await activityModel.find({user_id: req.user._id})
+                                .populate({
+                                    path:"user_id",
+                                    model:"user"
+                                })
+                                .populate({
+                                    path:"drill_id",
+                                    model:"drills"
+                                })
+                                .sort({createdAt:-1})
+                                .exec();
+
+        res.send({
+            data: {
+                user: user,
+                activity: activity,
+            }
+        })
      
     },
     show: function (req, res, next) {
