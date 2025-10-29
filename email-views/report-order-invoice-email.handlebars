@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Invoice</title>
+    <link href="https://fonts.googleapis.com/css?family=K2D:300,400,700&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0 auto; font-family: 'K2D', sans-serif;">
+    <div style="text-align: center;">
+        <div style="background-color: #072573; padding: 20px 0; color: #fff;">
+            <h3 style="font-size: 30px; text-transform: uppercase; font-weight: 300;">Invoice</h3>
+            <h4 style="font-size: 28px; text-transform: uppercase; font-weight: 300; margin: 0;">{{ invoice.transaction_id }}</h4>
+        </div>
+        <div>
+            <div style="width: 90%; margin: 0 auto;">
+                <div style="padding: 10px 0; border-bottom:3px solid #072573;">
+                    <img style="width: 130px;" src="localhost:8000/img/logo.b4228daa.png" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div style="width: 90%; margin: 0 auto;">
+            <div style="float: left;">
+                <h2 style="margin: 0;">Bill To</h2>
+                <ul style="margin: 0; padding: 0;">
+                    <li style="font-size: 20px; display: block;"> {{ invoice.user.firstName }} {{ invoice.user.lastName }}</li>
+                    <li style="font-size: 20px; display: block;"> {{ invoice.user.email }}</li>
+                </ul>
+            </div>
+            
+            <div style="clear:both; float:none;"></div>
+            <div style="padding: 20px 0;">
+                <table style="border-bottom: 3px solid #072573; width: 100%; text-align: left; border-collapse: collapse;">
+                    <tr>
+                        <th style="font-size: 20px; border-bottom: 3px solid #072573;">Subscription</th>
+                        <th style="font-size: 20px; border-bottom: 3px solid #072573;">Amount</th>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom: 2px solid #072573; padding: 15px 0; font-size: 20px;">Monthly </td>
+                        <td style="border-bottom: 2px solid #072573; padding: 15px 0; font-size: 20px;">${{ invoice.amount }}</td>
+                    </tr>
+                    
+                   
+                    <tr>
+                        <td style="padding: 10px; font-size: 20px;"><strong strong style="margin: 0;">Total:</strong></td>
+                        <td style="padding: 10px; font-size: 20px;"><span>${{ invoice.amount }} </span></td>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+    <div style="background-color: #072573; text-align: center; color: #fff; padding: 50px 0; font-size: 22px;">
+        <h5 style="margin: 0;">Elite </h5>
+    </div>
+</body>
+</html>
