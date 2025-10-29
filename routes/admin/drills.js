@@ -17,7 +17,6 @@ const storage=multer.diskStorage({
 })
 const upload=multer({storage:storage})
 var cpUpload = upload.fields([{ name: 'thumbnail', maxCount: 2 }, { name: 'video' }])
-
 router.post(
     "/admin/drills",
     cpUpload,
@@ -78,4 +77,15 @@ router.post(
 
 )
 
-module.exports=router;
+// write post api and pass drill_id, video_id, diffculty_id, speed_level_id
+// get diffuclty obj
+//get speedlevel =Obj from db
+// pervideoPoint = sp.points / sp.condition
+//get user detail from req.user
+// if user.watchedVideo do not have object against video_id, drill_il then push with 1 watched
+// else if already have object in this array with video_id and drill id then increament watched total
+
+// user.points += pervideoPoints
+// if (sp.condition == watchedVideoObj.watched_count) then user.points += diff.points
+// user me userpoints save kr do. .save()
+module.exports=router; 

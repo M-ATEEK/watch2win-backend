@@ -1,7 +1,47 @@
-const DifficultyLevelModel = require('../../models/difficultiesLevel-model');
+const DifficultyLevelModel = require("../../models/difficultiesLevel-model");
 var ObjectId = require("mongodb").ObjectID;
-const { validationResult } = require('express-validator');
+const { validationResult } = require("express-validator");
 module.exports = {
+	
+	index: async function (req, res, next) {
+		var _page = parseInt(req.query.page) || 1;
+		var _limit = parseInt(req.query.limit) || 10;
+		var skip = (_page - 1) * _limit;
+		let searchField = req.query.search;
+		if (searchField === undefined) {
+			const docCount = await DifficultyLevelModel.countDocuments({});
+			DifficultyLevelModel.find({})
+				.skip(skip)
+				.limit(_limit)
+				.sort({ created_at: -1 })
+				.exec(function (err, data) {
+					if (err) {
+						res.send(err);
+					} else {
+						res.send({
+							message: "fetched successfully",
+							data: {
+								count: docCount,
+								difficulty: data,
+							},
+						});
+					}
+				});
+		} else {
+			DifficultyLevelModel.find({ name: { $regex: searchField, $options: "$i" } }, (err, data) => {
+				if (err) {
+					res.send(err);
+				} else {
+					res.send({
+						message: " searched successfully",
+						data: {
+							difficulty: data,
+						},
+					});
+				}
+			});
+		}
+	},
 
     create: function (req, res, next) {
         if (!req.body.name) {
@@ -120,7 +160,9 @@ module.exports = {
                     }
                 });
             } else {
-                res.sendStatus(500);
+                res.send({
+                    message:"does not exist"
+                })
             }
         });
     },
@@ -162,5 +204,5 @@ module.exports = {
                 res.sendStatus(500);
             }
         });
-    }
-}
+    }	
+};
