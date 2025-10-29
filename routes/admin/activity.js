@@ -20,5 +20,11 @@ router.get(
     activityController.index
 );
 
+router.get(
+    "/admin/activity/:id", 
+    passport.authenticate("jwt", { session: false }),
+    activityController.getActivity
+  )
+
 
 module.exports = router;
