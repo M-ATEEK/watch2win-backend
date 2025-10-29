@@ -82,13 +82,10 @@ module.exports = {
                             console.log(err)
                         }
                         else {
-                            console.log('file dlete')
                         }
                     })
                 }
-
-                console.log(user)
-
+                
             }
         )
 
@@ -132,13 +129,10 @@ module.exports = {
                                 console.log(err)
                             }
                             else {
-                                console.log('file dlete')
                             }
                         })
                     }
-
-                    console.log(user)
-
+                    
                 }
             )
 
@@ -362,7 +356,7 @@ module.exports = {
     followUser:function(req,res){
         let isAdded = req.body.isAdded
         let userId = req.body.following
-        console.log(req.body.following)
+        
         if (isAdded) {
             userModel.update(
                 { _id: req.user._id },
