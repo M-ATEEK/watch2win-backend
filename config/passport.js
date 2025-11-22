@@ -25,7 +25,8 @@ module.exports = function(passport) {
                 callback(null, null);
               }
             });
-          }
+          },
+         
         },
         function(err, results) {
           if (results.user) {

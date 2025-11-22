@@ -96,4 +96,7 @@ function onListening() {
  * mongodb connection
  */
 console.log('-----------------------------', config.mongooseUriString);
-mongoose.connect(config.mongooseUriString);
+mongoose.set("useCreateIndex", true);
+mongoose.connect(config.mongooseUriString, {
+  useNewUrlParser: true
+});

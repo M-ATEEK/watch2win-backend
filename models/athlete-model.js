@@ -9,8 +9,8 @@ const AthleteSchema = new Schema({
     type: String,
     required: true
   },
-  image: {
-    type: String
+  image:{
+    type:String
   },
   createdAt: {
     type: Date,
@@ -20,4 +20,3 @@ const AthleteSchema = new Schema({
 
 const AthleteModel = mongoose.model("athlete", AthleteSchema);
 module.exports = AthleteModel;
-
