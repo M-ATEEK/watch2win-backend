@@ -37,13 +37,8 @@ var filesService = {
 
       return targetPath;
   },
-  saveImages: function(files, key, index, job, cb) {
-    if (files != null) {
-      let file = files[key + "_" + index];
-      if (key === "frontview_image") {
-        file = files[index];
-      }
-
+  saveImages: function(file, targetPath, cb) {
+    if (file != null) {
       if (file != undefined) {
         let imageName = file.name;
         let indexTypeImage = imageName.lastIndexOf(".");
@@ -52,43 +47,14 @@ var filesService = {
           imageName.length
         );
         let imageNewName = uniqueString() + imageExtension;
-        let targetPath = filesService.getPath(key, job._id) + imageNewName;
+        targetPath = targetPath + imageNewName;
         let tempPath = file.tempFilePath;
         mv(tempPath, targetPath, { mkdirp: true }, function(err) {
           if (err) {
             console.log('MOVE ERROR', err);
-            cb(false);
+            cb(imageNewName);
           } else {
-
-             fs.readFile(targetPath, "binary", function (err, data) {
-              if (err) return err;
-              let buffer = filesService.deleteThumbnailFromExif(data);
-               fs.writeFile(targetPath, buffer, "binary", function (err) {
-                console.log('targetPath removed ------', targetPath);
-                // START
-                jo.rotate(targetPath, options, (error, buffer, orientation, dimensions, quality) => {
-                  if (error) {
-                    console.log('An error occurred when rotating the file: ' + error.message);
-                    cb(imageNewName);
-                  } else {
-                    console.log('buffer', buffer);
-                    console.log('error', error);
-                    console.log('orientation', orientation);
-                    console.log('dimensions', dimensions);
-                    console.log('quality', quality);
-                    // save buffer on target path
-                    fs.writeFile(targetPath, buffer, "binary", function (err) {
-                      console.log('targetPath', targetPath);
-                      console.log('saVING binary--', err); // writes out file without error, but it's not a valid image
-                      cb(imageNewName);
-                    });
-                  }
-                  // ...Do whatever you need with the resulting buffer...
-                });
-                // END
-              });
-            }); 
-            
+            cb(false);
           }
         });
       } else {

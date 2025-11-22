@@ -21,8 +21,8 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({limit: '100mb'}));
+app.use(express.urlencoded({ extended: false, limit: '100mb' , parameterLimit: 1000}));
 app.use(cookieParser());
 app.use(
   "/static",
@@ -33,6 +33,7 @@ app.use(
   express.static(__dirname + "/public")
 );
 app.use("/image", express.static(__dirname + "/public/img/"));
+app.use("/image/drills", express.static(__dirname + "/public/drills/"));
 app.use("/documents", express.static(__dirname + "/public/documents"));
 
 app.use(cors());
