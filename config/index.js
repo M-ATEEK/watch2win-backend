@@ -52,13 +52,5 @@ module.exports = {
     timezones: ["8am-12pm", "4pm-6pm", "8pm-12am"],
     types: ["all", "check-in", "check-out", "interim-condition"],
     positions: ["all", "business", "landlord", "tenant"]
-  },
-  bankDetails: {
-    accountNo: process.env.NODE_ENV == 'production'? '1002425039' : '0000000000000',
-    ban: process.env.NODE_ENV == 'production'? 'AE390230000001002425039' : 'AE000000000000000000000',
-    accountHolder: process.env.NODE_ENV == 'production'? 'inventally DMCC' : 'Test',
-    bank: process.env.NODE_ENV == 'production'? 'Commercial Bank of Dubai' : 'Bank of Dubai',
-    mob: process.env.NODE_ENV == 'production'? '+971 58 548 1500' : '971 00 000 0000',
-    email: process.env.NODE_ENV == 'production'? 'sales@inventally.com' : 'test@gmail.com',
   }
 };

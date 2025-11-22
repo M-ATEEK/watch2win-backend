@@ -19,7 +19,6 @@ router.get(
     //userPolicy.isAllowed,
     activityController.index
 );
-
 router.get(
     "/admin/activity/:id", 
     passport.authenticate("jwt", { session: false }),
