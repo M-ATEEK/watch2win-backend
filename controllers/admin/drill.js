@@ -86,7 +86,7 @@ module.exports = {
 					path: "category",
 					model: "categories",
 					match: {
-						name: { $regex: categoryName, $options: "$i" },
+						name: { $regex: categoryName, $options: "i" },
 					},
 				})
 				.populate({
@@ -150,7 +150,7 @@ module.exports = {
 					path: "athlete",
 					model: "athlete",
 					match: {
-						name: { $regex: athleteName, $options: "$i" },
+						name: { $regex: athleteName, $options: "i" },
 					},
 				})
 				.populate({
@@ -248,7 +248,7 @@ module.exports = {
 					}
 				});
 		} else if (drillsName) {
-			drillsModel.find({ name: { $regex: drillsName, $options: "$i" } }, (err, data) => {
+			drillsModel.find({ name: { $regex: drillsName, $options: "i" } }, (err, data) => {
 				if (err) {
 					res.send(err);
 				} else {

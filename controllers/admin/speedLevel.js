@@ -85,7 +85,7 @@ module.exports = {
             
         }
         else {
-            SpeedLevelModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            SpeedLevelModel.find({ name: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {

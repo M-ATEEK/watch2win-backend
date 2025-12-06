@@ -99,7 +99,7 @@ module.exports = {
            
         }
         else {
-            athleteModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            athleteModel.find({ name: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {
