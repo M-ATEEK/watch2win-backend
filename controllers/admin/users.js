@@ -418,13 +418,16 @@ module.exports = {
     },
     search: async function (req, res, next) {
         try {
-            let keyword = req.query.keyword;
+            console.log('=== SEARCH ENDPOINT CALLED ===');
+            console.log('Query params:', req.query);
+            console.log('User from auth:', req.user ? req.user._id : 'No user');
             
-            console.log('Search endpoint called with keyword:', keyword);
+            let keyword = req.query.keyword;
             
             // Validate keyword exists
             if (!keyword || keyword.trim() === '') {
-                return res.status(400).send({
+                console.log('Keyword validation failed');
+                return res.status(400).json({
                     success: false,
                     message: "Keyword parameter is required",
                     data: {
@@ -438,32 +441,37 @@ module.exports = {
             // Trim and use keyword as-is for regex matching
             keyword = keyword.trim();
             
-            console.log('Searching for:', keyword);
+            console.log('Searching for keyword:', keyword);
 
             // Perform searches with error handling
-            let users, category, athlete;
+            let users = [];
+            let category = [];
+            let athlete = [];
             
             try {
-                users = await userModel.find({ firstName: { $regex: keyword, $options: 'i' } });
-                console.log('Users found:', users ? users.length : 0);
+                console.log('Querying users with firstName regex:', keyword);
+                users = await userModel.find({ firstName: { $regex: keyword, $options: 'i' } }).lean();
+                console.log('Users found:', users.length);
             } catch (err) {
-                console.error('Error searching users:', err);
+                console.error('Error searching users:', err.message, err.stack);
                 users = [];
             }
             
             try {
-                category = await categoriesModel.find({ name: { $regex: keyword, $options: 'i' } });
-                console.log('Categories found:', category ? category.length : 0);
+                console.log('Querying categories with name regex:', keyword);
+                category = await categoriesModel.find({ name: { $regex: keyword, $options: 'i' } }).lean();
+                console.log('Categories found:', category.length);
             } catch (err) {
-                console.error('Error searching categories:', err);
+                console.error('Error searching categories:', err.message, err.stack);
                 category = [];
             }
             
             try {
-                athlete = await athleteModel.find({ name: { $regex: keyword, $options: 'i' } });
-                console.log('Athletes found:', athlete ? athlete.length : 0);
+                console.log('Querying athletes with name regex:', keyword);
+                athlete = await athleteModel.find({ name: { $regex: keyword, $options: 'i' } }).lean();
+                console.log('Athletes found:', athlete.length);
             } catch (err) {
-                console.error('Error searching athletes:', err);
+                console.error('Error searching athletes:', err.message, err.stack);
                 athlete = [];
             }
 
@@ -471,17 +479,19 @@ module.exports = {
                 success: true,
                 message: "Search completed successfully",
                 data: {
-                    users: users || [],
-                    categories: category || [],
-                    athlete: athlete || []
+                    users: users,
+                    categories: category,
+                    athlete: athlete
                 }
             };
             
-            console.log('Search response prepared');
-            res.send(response);
+            console.log('Sending response with', users.length, 'users,', category.length, 'categories,', athlete.length, 'athletes');
+            return res.json(response);
         } catch (error) {
-            console.error('Search error:', error);
-            res.status(500).send({
+            console.error('=== SEARCH ERROR ===');
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
+            return res.status(500).json({
                 success: false,
                 message: "An error occurred while searching",
                 error: error.message,

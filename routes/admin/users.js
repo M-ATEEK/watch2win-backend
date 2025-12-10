@@ -65,12 +65,12 @@ router.post(
     "/user/favoriteVideo",
     passport.authenticate("jwt", { session: false }),
     usersController.addToFvorite
-),
- router.post(
-        "/user/watchLater",
-        passport.authenticate("jwt", { session: false }),
-        usersController.addToWatchLater
-    )
+);
+router.post(
+    "/user/watchLater",
+    passport.authenticate("jwt", { session: false }),
+    usersController.addToWatchLater
+);
 router.get(
     "/user/search",
     passport.authenticate("jwt", { session: false }),
