@@ -28,7 +28,7 @@ module.exports = {
 					}
 				});
 		} else {
-			DifficultyLevelModel.find({ name: { $regex: searchField, $options: "$i" } }, (err, data) => {
+			DifficultyLevelModel.find({ name: { $regex: searchField, $options: "i" } }, (err, data) => {
 				if (err) {
 					res.send(err);
 				} else {
@@ -128,7 +128,7 @@ module.exports = {
             
         }
         else {
-            DifficultyLevelModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            DifficultyLevelModel.find({ name: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {

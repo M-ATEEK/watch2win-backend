@@ -61,7 +61,7 @@ module.exports = {
 
         }
         else {
-            userModel.find({ firstName: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            userModel.find({ firstName: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {
@@ -418,9 +418,9 @@ module.exports = {
     },
     search: async function (req, res, next) {
         let keyword = req.query.keyword;
-        let users = await userModel.find({ firstName: { $regex: keyword, $options: '$i' } })
-        let category = await categoriesModel.find({ name: { $regex: keyword, $options: '$i' } })
-        let athlete = await athleteModel.find({ name: { $regex: keyword, $options: '$i' } })
+        let users = await userModel.find({ firstName: { $regex: keyword, $options: 'i' } })
+        let category = await categoriesModel.find({ name: { $regex: keyword, $options: 'i' } })
+        let athlete = await athleteModel.find({ name: { $regex: keyword, $options: 'i' } })
         res.send({
             data: {
                 users: users,

@@ -95,7 +95,7 @@ module.exports = {
             
         }
         else {
-            categoriesModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            categoriesModel.find({ name: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {

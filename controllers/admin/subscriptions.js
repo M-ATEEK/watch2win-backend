@@ -54,7 +54,7 @@ module.exports = {
             });
         }
         else {
-            SubscriptionsModel.find({ name: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            SubscriptionsModel.find({ name: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {
