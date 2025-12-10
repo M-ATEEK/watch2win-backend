@@ -61,7 +61,7 @@ module.exports = {
 
         }
         else {
-            userModel.find({ firstName: { $regex: searchField, $options: '$i' } }, (err, data) => {
+            userModel.find({ firstName: { $regex: searchField, $options: 'i' } }, (err, data) => {
                 if (err) {
                     res.send(err);
                 } else {
@@ -417,17 +417,78 @@ module.exports = {
         });
     },
     search: async function (req, res, next) {
-        let keyword = req.query.keyword;
-        let users = await userModel.find({ firstName: { $regex: keyword, $options: '$i' } })
-        let category = await categoriesModel.find({ name: { $regex: keyword, $options: '$i' } })
-        let athlete = await athleteModel.find({ name: { $regex: keyword, $options: '$i' } })
-        res.send({
-            data: {
-                users: users,
-                categories: category,
-                athlete: athlete
+        try {
+            let keyword = req.query.keyword;
+            
+            // Validate keyword exists
+            if (!keyword || keyword.trim() === '') {
+                return res.status(400).json({
+                    success: false,
+                    message: "Keyword parameter is required",
+                    data: {
+                        users: [],
+                        categories: [],
+                        athlete: []
+                    }
+                });
             }
-        })
+
+            // Trim keyword
+            keyword = keyword.trim();
+
+            // Perform searches with error handling and limits
+            let users = [];
+            let category = [];
+            let athlete = [];
+            
+            try {
+                users = await userModel.find({ 
+                    firstName: { $regex: keyword, $options: 'i' } 
+                }).limit(50).lean();
+            } catch (err) {
+                console.error('Error searching users:', err);
+                users = [];
+            }
+            
+            try {
+                category = await categoriesModel.find({ 
+                    name: { $regex: keyword, $options: 'i' } 
+                }).limit(50).lean();
+            } catch (err) {
+                console.error('Error searching categories:', err);
+                category = [];
+            }
+            
+            try {
+                athlete = await athleteModel.find({ 
+                    name: { $regex: keyword, $options: 'i' } 
+                }).limit(50).lean();
+            } catch (err) {
+                console.error('Error searching athletes:', err);
+                athlete = [];
+            }
+
+            res.json({
+                success: true,
+                message: "Search completed successfully",
+                data: {
+                    users: users || [],
+                    categories: category || [],
+                    athlete: athlete || []
+                }
+            });
+        } catch (error) {
+            console.error('Search error:', error);
+            res.status(500).json({
+                success: false,
+                message: "An error occurred while searching",
+                data: {
+                    users: [],
+                    categories: [],
+                    athlete: []
+                }
+            });
+        }
     },
     googlelogin: function (req, res, next) {
         let { tokenId, source } = req.body;
