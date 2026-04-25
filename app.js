@@ -8,6 +8,8 @@ const cors = require("cors");
 const fileUpload = require("express-fileupload");
 var passport = require("passport");
 const multipart = require("connect-multiparty")();
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
 
 // var adminRouter = require("./routes/admin");
 // var configRouter = require("./routes/config");
@@ -42,6 +44,41 @@ app.disable("etag");
 require("./config/cors")(app);
 require("./router")(app);
 require("./config/passport")(passport);
+
+const buildSwaggerSpec = req => {
+  const forwardedProto = req.headers["x-forwarded-proto"];
+  const protocol = forwardedProto
+    ? forwardedProto.split(",")[0].trim()
+    : req.protocol;
+  const host = req.get("host");
+
+  return {
+    ...swaggerSpec,
+    servers: [
+      {
+        url: `${protocol}://${host}/api/v1`,
+        description: "Current request host"
+      }
+    ]
+  };
+};
+
+app.get("/api-docs.json", (req, res) => {
+  res.json(buildSwaggerSpec(req));
+});
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  (req, res, next) => {
+    swaggerUi.setup(buildSwaggerSpec(req), {
+      explorer: true,
+      swaggerOptions: {
+        persistAuthorization: true
+      }
+    })(req, res, next);
+  }
+);
 
 // app.use("/admin", adminRouter);
 // app.use("/config", configRouter);
